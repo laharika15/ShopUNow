@@ -1,0 +1,17 @@
+# Python virtual environments
+venv/
+env/
+.env
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Databases
+chroma_db/
+*.sqlite3
+
+# Project specific
+data/
