@@ -6,6 +6,29 @@ ShopUNow Agentic AI Assistant is an intelligent, quota-efficient Retrieval-Augme
 This project was built as a capstone project focusing on Agentic RAG, LangGraph routing, strict LLM grounding, and deterministic evaluation, all while heavily optimizing for free-tier LLM API usage.
 
 ## System Architecture
+
+```mermaid
+graph TD
+    A[User Query] --> B[Groq Categorizer Node]
+    B --> |Sentiment & Department| C{Query Router}
+    C -->|Negative Sentiment OR<br>Unknown Department| D[Human Escalation Node]
+    C -->|Positive/Neutral Sentiment AND<br>Known Department| E[Retrieval Node]
+    
+    E --> F[(ChromaDB + Local HF Embeddings)]
+    F -->|Metadata Filter: Department| E
+    
+    E --> G{Relevance Threshold Check}
+    G -->|Below Threshold| H[Controlled Abstention Node]
+    G -->|Above Threshold| I[Groq RAG Generation Node]
+    
+    I --> J{Reflection Enabled?}
+    J -->|Yes| K[Groq Reflection Node]
+    J -->|No| L[Final Response]
+    K --> L
+    H --> L
+    D --> L
+```
+
 The system uses a graph-based workflow powered by LangGraph:
 1. **Categorization**: The user query is sent to a Groq LLM to determine the sentiment (Positive/Neutral/Negative) and the target Department.
 2. **Conditional Routing**:
