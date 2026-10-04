@@ -11,26 +11,28 @@ This project was built as a capstone project focusing on Agentic RAG, LangGraph 
 
 ```mermaid
 graph TD
-    A[User Query] --> B[Groq Categorizer Node]
-    B --> |Sentiment & Department| C{Query Router}
-    C -->|Negative Sentiment OR<br>Unknown Department| D[Human Escalation Node]
-    C -->|Positive/Neutral Sentiment AND<br>Known Department| E[Retrieval Node]
-    
-    E --> F[(ChromaDB + Local HF Embeddings)]
-    F -->|Metadata Filter: Department| E
-    
-    E --> G{Relevance Threshold Check}
-    G -->|Below Threshold| H[Controlled Abstention Node]
-    G -->|Above Threshold| I[Groq RAG Generation Node]
-    
+    A[User Query] --> B[Groq Categorizer]
+    B -->|Sentiment + Department| C{Query Router}
+
+    C -->|Negative OR Unknown| D[Human Escalation]
+    C -->|Positive/Neutral + Known| E[Department-Aware Retrieval]
+
+    E --> F[(ChromaDB + Local Hugging Face Embeddings)]
+    F -->|Department Metadata Filter| E
+
+    E --> G{Relevance Threshold}
+
+    G -->|Below Threshold| H[Controlled Abstention]
+    G -->|Above Threshold| I[Groq RAG Generation]
+
     I --> J{Reflection Enabled?}
-    J -->|Yes| K[Groq Reflection Node]
+    J -->|Yes| K[Groq Reflection]
     J -->|No| L[Final Response]
+
     K --> L
     H --> L
     D --> L
 ```
-
 The system uses a graph-based workflow powered by LangGraph:
 1. **Categorization**: The user query is sent to a Groq LLM to determine the sentiment (Positive/Neutral/Negative) and the target Department.
 2. **Conditional Routing**:
@@ -135,3 +137,17 @@ The evaluation validates:
 - Controlled abstention
 - Negative-sentiment escalation
 - Routing behavior
+
+
+## Technology Stack
+
+- **Python**
+- **LangGraph** — agent workflow and conditional routing
+- **LangChain** — LLM and RAG integration
+- **Groq** — LLM inference
+- **ChromaDB** — vector database
+- **Hugging Face Sentence Transformers** — local embeddings
+- **FastAPI** — REST API
+- **Streamlit** — conversational web interface
+- **Pydantic** — structured data validation
+- **GitHub** — version control and deployment source
