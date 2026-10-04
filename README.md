@@ -1,5 +1,7 @@
 # ShopUNow Agentic AI Assistant
 
+### Live Demo: https://shopunow-demo-assistant.streamlit.app
+
 ## Overview
 ShopUNow Agentic AI Assistant is an intelligent, quota-efficient Retrieval-Augmented Generation (RAG) system built to serve both internal employees and external customers for a retail company. It routes queries to specific departmental knowledge bases (HR, IT Support, Billing & Payments, Shipping & Delivery) or escalates negative/unknown queries to human support agents.
 
@@ -81,8 +83,27 @@ python database.py
 ```
 *(This will embed the data using local Hugging Face models and persist it to `chroma_db/`).*
 
+## Knowledge Base
+
+The project uses a synthetic retail support dataset containing 48 QA records:
+
+| Department | QA Records |
+|---|---:|
+| HR | 12 |
+| IT Support | 12 |
+| Billing & Payments | 12 |
+| Shipping & Delivery | 12 |
+| **Total** | **48** |
+
+Each record includes department and audience metadata, enabling department-aware retrieval and preventing cross-department knowledge leakage.
+
 ## Running the Application
 
+### Streamlit Web Interface
+Run the conversational UI:
+```bash
+streamlit run ui.py
+```
 ### Command Line Interface
 Test the agent using the simple CLI:
 ```bash
@@ -106,3 +127,11 @@ The project includes a deterministic evaluation suite that does not consume exce
 ```bash
 python evaluation.py
 ```
+**Current evaluation result: 5/5 tests passed.**
+
+The evaluation validates:
+- Department-aware retrieval
+- Correct RAG responses
+- Controlled abstention
+- Negative-sentiment escalation
+- Routing behavior
