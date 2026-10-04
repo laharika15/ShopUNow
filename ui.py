@@ -1,5 +1,8 @@
 import streamlit as st
+from database import initialize_database
 from agent import graph_app
+
+initialize_database()
 
 # -----------------------------
 # Page configuration
