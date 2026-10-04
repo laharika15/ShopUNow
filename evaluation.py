@@ -7,13 +7,13 @@ def run_evaluation():
     test_cases = [
         # Normal queries mapped to correct departments
         {
-            "query": "How do I apply for PTO?",
+            "query": "How do I apply for a vacation day?",
             "expected_department": "HR",
             "expected_routing": "rag",
             "expected_abstention": False
         },
         {
-            "query": "My laptop screen is flickering, what should I do?",
+            "query": "What should I do if my laptop is running slow after the latest Windows update?",
             "expected_department": "IT Support",
             "expected_routing": "rag",
             "expected_abstention": False
@@ -33,8 +33,11 @@ def run_evaluation():
         },
         # Out-of-scope / insufficient context query
         {
-            "query": "What is the exact net worth of the CEO of ShopUNow?",
-            "expected_abstention": True
+    
+    "query": "What is the exact net worth of the CEO of ShopUNow?",
+    "expected_department": "Unknown",
+    "expected_routing": "escalation",
+    "expected_escalation_trigger": True
         }
     ]
     

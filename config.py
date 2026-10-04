@@ -15,8 +15,8 @@ RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", 0.5))
 ENABLE_REFLECTION = os.getenv("ENABLE_REFLECTION", "False").lower() in ["true", "1", "yes"]
 
 # LLM Models
-ROUTER_MODEL = "llama3-70b-8192"  # Recommended robust model for Groq categorization
-RAG_MODEL = "llama3-8b-8192"      # Smaller, faster model for simple grounded generation
+ROUTER_MODEL = "openai/gpt-oss-20b"  # Recommended robust model for Groq categorization
+RAG_MODEL = "openai/gpt-oss-20b"      # Smaller, faster model for simple grounded generation
 
 # Paths
 CHROMA_PERSIST_DIR = "./chroma_db"

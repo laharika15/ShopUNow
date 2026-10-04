@@ -15,3 +15,7 @@ chroma_db/
 
 # Project specific
 data/
+
+# Local development
+.venv311/
+.DS_Store
