@@ -38,8 +38,8 @@ The system uses a graph-based workflow powered by LangGraph:
 2. **Conditional Routing**:
    - *Escalation*: If sentiment is Negative OR the department is Unknown, it routes to a Human Escalation node.
    - *RAG*: Otherwise, it routes to the Department-Aware RAG workflow.
-3. **Retrieval**: Queries a local ChromaDB instance. It uses local Hugging Face embeddings (`sentence-transformers/all-MiniLM-L6-v2`) and strictly filters the database using the categorized department as metadata to prevent cross-department leakage.
-4. **Relevance Threshold & Abstention**: If the retrieved documents do not meet a configurable relevance threshold, the system aborts LLM generation and abstains safely to prevent hallucinations.
+3. **Department-Aware Retrieval**: Queries a local ChromaDB instance using local Hugging Face embeddings (`sentence-transformers/all-MiniLM-L6-v2`). The categorized department is applied as a metadata filter to prevent cross-department retrieval and knowledge leakage.
+4. **Relevance Threshold & Controlled Abstention**: If retrieved documents do not meet the configured relevance threshold, the system skips LLM generation and returns a controlled abstention response to reduce hallucinations.
 5. **Grounded Generation**: If relevant context is found, it uses Groq to generate a final answer *strictly* grounded in the retrieved documents.
 6. **Reflection (Optional)**: Can be toggled on to re-verify the output against the context.
 
