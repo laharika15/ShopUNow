@@ -1,5 +1,5 @@
 import streamlit as st
-import requests
+from agent import graph_app
 
 # -----------------------------
 # Page configuration
@@ -25,13 +25,6 @@ st.markdown("""
         color: #666;
         font-size: 1rem;
         margin-bottom: 1.5rem;
-    }
-
-    .status-box {
-        padding: 12px;
-        border-radius: 10px;
-        background-color: #f5f5f5;
-        margin-top: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -64,9 +57,11 @@ if "messages" not in st.session_state:
 # -----------------------------
 with st.sidebar:
     st.header("💡 Try an Example")
+
     if st.button("🗑️ Clear Chat", use_container_width=True):
         st.session_state.messages = []
         st.rerun()
+
     example_questions = [
         "How do I reset my ShopUNow employee VPN password?",
         "How do I apply for a vacation day?",
@@ -140,50 +135,30 @@ if query:
         with st.chat_message("assistant"):
 
             with st.spinner("🤖 ShopUNow AI is analyzing your question..."):
+                result = graph_app.invoke({"query": query})
 
-                response = requests.post(
-                    "http://127.0.0.1:8000/query",
-                    json={"query": query},
-                    timeout=120
-                )
+            st.write(result["response"])
 
-            if response.status_code == 200:
+            st.divider()
 
-                result = response.json()
+            col1, col2 = st.columns(2)
 
-                st.write(result["response"])
+            with col1:
+                st.caption("Department")
+                st.write(result["department"])
 
-                st.divider()
+            with col2:
+                st.caption("Sentiment")
+                st.write(result["sentiment"])
 
-                col1, col2 = st.columns(2)
-
-                with col1:
-                    st.caption("Department")
-                    st.write(result["department"])
-
-                with col2:
-                    st.caption("Sentiment")
-                    st.write(result["sentiment"])
-
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": result["response"],
-                    "metadata": {
-                        "department": result["department"],
-                        "sentiment": result["sentiment"]
-                    }
-                })
-
-            else:
-                st.error(
-                    f"Backend returned an error: {response.status_code}"
-                )
-
-    except requests.exceptions.ConnectionError:
-        st.error(
-            "⚠️ The ShopUNow AI backend is not running. "
-            "Please start the FastAPI server."
-        )
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": result["response"],
+                "metadata": {
+                    "department": result["department"],
+                    "sentiment": result["sentiment"]
+                }
+            })
 
     except Exception as e:
         st.error(f"Something went wrong: {e}")
