@@ -9,7 +9,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # RAG Configuration
 TOP_K = int(os.getenv("TOP_K", 3))
-RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", 0.5))
+RELEVANCE_THRESHOLD = float(os.getenv("RELEVANCE_THRESHOLD", 0.45))
 
 # Application Mode
 ENABLE_REFLECTION = os.getenv("ENABLE_REFLECTION", "False").lower() in ["true", "1", "yes"]
