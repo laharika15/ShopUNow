@@ -3,15 +3,14 @@ import re
 from database import get_chroma_client, get_embeddings_model
 from config import TOP_K, RELEVANCE_THRESHOLD
 
-# Synonyms used to improve semantic retrieval across all departments
+
 SYNONYM_MAP = {
-    # HR
-    "vacation": [
-        "vacation", "pto", "paid time off", "time off",
-        "leave", "annual leave", "days off"
-    ],
     "pto": [
         "pto", "vacation", "paid time off", "time off",
+        "leave", "annual leave", "days off"
+    ],
+    "vacation": [
+        "vacation", "pto", "paid time off", "time off",
         "leave", "annual leave", "days off"
     ],
     "paid time off": [
@@ -44,9 +43,6 @@ SYNONYM_MAP = {
         "benefits", "employee benefits", "benefit plan",
         "health benefits", "insurance benefits"
     ],
-    "dependent": [
-        "dependent", "family member", "spouse", "child"
-    ],
     "onboarding": [
         "onboarding", "new employee setup",
         "new hire setup", "joining process",
@@ -57,12 +53,6 @@ SYNONYM_MAP = {
         "flexible work arrangement", "remote work",
         "hybrid work", "work from home"
     ],
-    "employment documents": [
-        "employment documents", "employee documents",
-        "employment letter", "job documents", "hr documents"
-    ],
-
-    # IT Support
     "password": [
         "password", "passcode", "login password",
         "sign in password", "account password", "credentials"
@@ -72,8 +62,9 @@ SYNONYM_MAP = {
         "authentication", "account access"
     ],
     "credentials": [
-        "credentials", "login details", "login credentials",
-        "username and password", "account credentials"
+        "credentials", "login details",
+        "login credentials", "username and password",
+        "account credentials"
     ],
     "wifi": [
         "wifi", "wi-fi", "wireless network",
@@ -111,8 +102,6 @@ SYNONYM_MAP = {
         "vpn", "virtual private network",
         "remote network access", "secure remote access"
     ],
-
-    # Billing & Payments
     "refund": [
         "refund", "money back", "reimbursement",
         "refund payment", "return of payment",
@@ -163,8 +152,6 @@ SYNONYM_MAP = {
         "declined payment", "payment declined",
         "transaction declined"
     ],
-
-    # Shipping & Delivery
     "shipping": [
         "shipping", "delivery", "shipment",
         "dispatch", "shipping service", "package delivery"
@@ -215,8 +202,6 @@ SYNONYM_MAP = {
         "express shipping", "expedited shipping",
         "fast shipping", "priority shipping", "rush delivery"
     ],
-
-    # Returns
     "return": [
         "return", "returns", "return policy",
         "return item", "product return", "send back"
@@ -244,14 +229,9 @@ SYNONYM_MAP = {
 
 
 def expand_query_with_synonyms(query: str) -> str:
-    """
-    Expands the query with related terms to improve retrieval.
-    The original query is preserved.
-    """
     query_lower = query.lower()
     matched_terms = []
 
-    # Check longer phrases first
     sorted_terms = sorted(
         SYNONYM_MAP.keys(),
         key=len,
@@ -264,7 +244,6 @@ def expand_query_with_synonyms(query: str) -> str:
         if re.search(pattern, query_lower):
             matched_terms.extend(SYNONYM_MAP[term])
 
-    # Remove duplicate terms
     unique_terms = list(dict.fromkeys(matched_terms))
 
     if not unique_terms:
@@ -277,58 +256,118 @@ def expand_query_with_synonyms(query: str) -> str:
 
 
 def retrieve_context(query: str, department: str) -> str:
-    """
-    Retrieves context for a given query, filtered by the specified department.
-    Returns the context as a single string, or a specific abstention message
-    if no results meet the RELEVANCE_THRESHOLD.
-    """
     client = get_chroma_client()
 
-    try:
-        collection = client.get_collection(name="shopunow_faqs")
-    except Exception:
-        # Collection might not exist yet if database.py hasn't run
-        return "I don't have enough information in the ShopUNow knowledge base to answer this accurately."
+    abstention_message = (
+        "I don't have enough information in the "
+        "ShopUNow knowledge base to answer this accurately."
+    )
 
-    # Check if database is empty
+    try:
+        collection = client.get_collection(
+            name="shopunow_faqs"
+        )
+    except Exception:
+        return abstention_message
+
     if collection.count() == 0:
-        return "I don't have enough information in the ShopUNow knowledge base to answer this accurately."
+        return abstention_message
 
     embeddings_model = get_embeddings_model()
 
-    # Expand the query before embedding for better retrieval
-    retrieval_query = expand_query_with_synonyms(query)
+    def search_chroma(search_query: str):
+        query_embedding = embeddings_model.embed_query(
+            search_query
+        )
 
-    # Embed the expanded retrieval query
-    query_embedding = embeddings_model.embed_query(retrieval_query)
+        results = collection.query(
+            query_embeddings=[query_embedding],
+            n_results=TOP_K,
+            where={"department": department},
+            include=[
+                "documents",
+                "distances",
+                "metadatas"
+            ]
+        )
 
-    # Query ChromaDB with strict metadata filter on department
-    # Chroma returns distance (L2 by default). Lower distance = higher relevance.
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=TOP_K,
-        where={"department": department},
-        include=["documents", "distances", "metadatas"]
+        if (
+            not results["documents"]
+            or not results["documents"][0]
+        ):
+            return []
+
+        documents = results["documents"][0]
+        distances = results["distances"][0]
+
+        valid_documents = []
+
+        for doc, distance in zip(
+            documents,
+            distances
+        ):
+            similarity = 1 / (1 + distance)
+
+            print(
+                f"[RAG] Query='{search_query}' "
+                f"Similarity={similarity:.4f}"
+            )
+
+            if similarity >= RELEVANCE_THRESHOLD:
+                valid_documents.append(
+                    (doc, similarity)
+                )
+
+        return valid_documents
+
+    valid_results = search_chroma(query)
+
+    if valid_results:
+        print(
+            f"[RAG] Original query matched "
+            f"{len(valid_results)} document(s)."
+        )
+        print(f"[RAG] Department: {department}")
+
+        return "\n\n---\n\n".join(
+            doc
+            for doc, score in valid_results
+        )
+
+    expanded_query = expand_query_with_synonyms(query)
+
+    if expanded_query != query:
+        print(
+            "[RAG] Original query did not meet "
+            "the relevance threshold."
+        )
+        print(
+            f"[RAG] Trying synonym-expanded query: "
+            f"{expanded_query}"
+        )
+
+        valid_results = search_chroma(
+            expanded_query
+        )
+
+        if valid_results:
+            print(
+                f"[RAG] Synonym-expanded query matched "
+                f"{len(valid_results)} document(s)."
+            )
+            print(f"[RAG] Department: {department}")
+
+            return "\n\n---\n\n".join(
+                doc
+                for doc, score in valid_results
+            )
+
+    print(
+        "[RAG] No sufficiently relevant Chroma "
+        "documents found."
     )
+    print(f"[RAG] Query: {query}")
+    print(f"[RAG] Department: {department}")
 
-    if not results["documents"] or not results["documents"][0]:
-        return "I don't have enough information in the ShopUNow knowledge base to answer this accurately."
-
-    documents = results["documents"][0]
-    distances = results["distances"][0]
-
-    valid_context_blocks = []
-
-    for doc, distance in zip(documents, distances):
-        # Convert L2 distance to a basic similarity score (0 to 1)
-        similarity = 1 / (1 + distance)
-
-        # Only include documents that meet the relevance threshold
-        if similarity >= RELEVANCE_THRESHOLD:
-            valid_context_blocks.append(doc)
-
-    # If no documents met the threshold, abort and abstain
-    if not valid_context_blocks:
-        return "I don't have enough information in the ShopUNow knowledge base to answer this accurately."
-
-    return "\n\n---\n\n".join(valid_context_blocks)
+    return abstention_message
+ 
