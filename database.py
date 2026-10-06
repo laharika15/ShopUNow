@@ -1,7 +1,9 @@
 import os
 import json
 import chromadb
+from collections import Counter
 from langchain_huggingface import HuggingFaceEmbeddings
+
 from config import (
     CHROMA_PERSIST_DIR,
     DATASET_PATH,
@@ -13,7 +15,9 @@ COLLECTION_NAME = "shopunow_faqs"
 
 
 def get_chroma_client():
-    return chromadb.PersistentClient(path=CHROMA_PERSIST_DIR)
+    return chromadb.PersistentClient(
+        path=CHROMA_PERSIST_DIR
+    )
 
 
 def get_embeddings_model():
@@ -23,7 +27,7 @@ def get_embeddings_model():
 
 
 def initialize_database():
-    """Rebuilds the ShopUNow Chroma collection from the JSON dataset."""
+    """Rebuild the Chroma collection from the JSON dataset."""
 
     if not os.path.exists(DATASET_PATH):
         print(
@@ -32,18 +36,23 @@ def initialize_database():
         )
         return
 
-    # Load dataset
-    with open(DATASET_PATH, "r", encoding="utf-8") as f:
+    with open(
+        DATASET_PATH,
+        "r",
+        encoding="utf-8"
+    ) as f:
         qa_data = json.load(f)
 
     if not isinstance(qa_data, list):
         raise ValueError(
-            "Dataset must be a JSON list of QA records."
+            "Dataset must be a JSON list."
         )
 
-    print(f"Loaded {len(qa_data)} records from dataset.")
+    print(
+        f"Loaded {len(qa_data)} records "
+        f"from {DATASET_PATH}"
+    )
 
-    # Validate records
     required_fields = {
         "question",
         "answer",
@@ -56,36 +65,34 @@ def initialize_database():
 
         if missing:
             raise ValueError(
-                f"Record {index} is missing fields: {missing}"
+                f"Record {index} is missing: {missing}"
             )
 
-    # Show department counts
-    from collections import Counter
-
-    department_counts = Counter(
-        item["department"] for item in qa_data
+    counts = Counter(
+        item["department"]
+        for item in qa_data
     )
 
-    print("\nDataset department counts:")
+    print("\nDepartment counts:")
 
-    for department, count in department_counts.items():
+    for department, count in counts.items():
         print(f"  {department}: {count}")
 
-    # Create Chroma client
     client = get_chroma_client()
 
-    # IMPORTANT:
-    # Delete the old collection so the new dataset is actually loaded.
+    # Rebuild the collection so the latest dataset is indexed.
     try:
-        client.delete_collection(name=COLLECTION_NAME)
+        client.delete_collection(
+            name=COLLECTION_NAME
+        )
         print(
-            f"\nDeleted existing Chroma collection: "
+            f"\nDeleted existing collection: "
             f"{COLLECTION_NAME}"
         )
     except Exception:
         print(
             f"\nNo existing collection found. "
-            f"Creating: {COLLECTION_NAME}"
+            f"Creating {COLLECTION_NAME}."
         )
 
     collection = client.create_collection(
@@ -100,13 +107,12 @@ def initialize_database():
 
     for index, item in enumerate(qa_data):
 
-        # Keep each complete QA pair as one document.
-        doc_text = (
+        document = (
             f"Question: {item['question']}\n"
             f"Answer: {item['answer']}"
         )
 
-        documents.append(doc_text)
+        documents.append(document)
 
         metadatas.append({
             "record_id": str(index),
@@ -115,11 +121,12 @@ def initialize_database():
             "source": "synthetic_dataset"
         })
 
-        ids.append(f"shopunow_{index}")
+        ids.append(
+            f"shopunow_{index}"
+        )
 
     print(
-        "\nGenerating local embeddings. "
-        "This may take a moment..."
+        "\nGenerating local embeddings..."
     )
 
     embeddings = embeddings_model.embed_documents(
@@ -136,18 +143,18 @@ def initialize_database():
     final_count = collection.count()
 
     print("\n" + "=" * 60)
-    print("ChromaDB initialization complete.")
+    print("CHROMA INITIALIZATION COMPLETE")
+    print("=" * 60)
     print(f"Documents loaded: {final_count}")
     print(f"Collection: {COLLECTION_NAME}")
-    print(f"Location: {CHROMA_PERSIST_DIR}")
-    print("=" * 60)
+    print(f"Database: {CHROMA_PERSIST_DIR}")
 
     if final_count == 80:
-        print("\nSUCCESS: ChromaDB contains exactly 80 records.")
+        print("\nSUCCESS: Chroma contains 80 records.")
     else:
         print(
             f"\nWARNING: Expected 80 records, "
-            f"but ChromaDB contains {final_count}."
+            f"but Chroma contains {final_count}."
         )
 
 
