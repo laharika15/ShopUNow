@@ -87,7 +87,7 @@ python database.py
 
 ## Knowledge Base
 
-The project uses a synthetic retail support dataset containing 48 QA records:
+The project uses a synthetic retail support dataset containing 80 QA records:
 
 | Department | QA Records |
 |---|---:|
