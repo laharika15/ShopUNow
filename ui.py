@@ -97,7 +97,8 @@ with st.sidebar:
     st.write("• Department-aware routing")
     st.write("• Knowledge-grounded answers")
     st.write("• Sentiment detection")
-    st.write("• Human escalation")
+    st.write("• Human support escalation")
+    st.write("• Contact information collection")
     st.write("• Hallucination prevention")
 
 # -----------------------------
