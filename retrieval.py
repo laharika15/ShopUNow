@@ -207,11 +207,4 @@ def retrieve_context(
         continue
 
     seen.add(doc)
-
-    print(
-        f"\n[RAG] Retrieved document "
-        f"(Similarity={similarity:.4f}):"
-    )
-    print(doc)
-
     context_blocks.append(doc)
