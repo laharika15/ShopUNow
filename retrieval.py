@@ -203,12 +203,15 @@ def retrieve_context(
 
     for doc, similarity in results:
 
-        if doc in seen:
-            continue
+    if doc in seen:
+        continue
 
-        seen.add(doc)
-        context_blocks.append(doc)
+    seen.add(doc)
 
-    return "\n\n---\n\n".join(
-        context_blocks
+    print(
+        f"\n[RAG] Retrieved document "
+        f"(Similarity={similarity:.4f}):"
     )
+    print(doc)
+
+    context_blocks.append(doc)
