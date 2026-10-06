@@ -17,62 +17,152 @@ ABSTENTION_MESSAGE = (
 )
 
 
+# Deterministic semantic expansion
+# No additional LLM call is used.
+
 SYNONYM_MAP = {
+
+    # HR
     "pto": [
         "paid time off",
         "vacation",
         "time off",
         "leave"
     ],
+
     "paid time off": [
         "pto",
         "vacation",
         "time off",
         "leave"
     ],
+
     "vacation": [
         "pto",
         "paid time off",
         "time off",
         "leave"
     ],
+
     "sick": [
         "sick leave",
         "medical leave",
-        "absence"
+        "absence",
+        "leave request"
     ],
+
     "sick leave": [
         "sick",
         "medical leave",
-        "absence"
+        "absence",
+        "leave request"
     ],
+
+    "paternity": [
+        "paternity leave",
+        "parental leave",
+        "family leave"
+    ],
+
+    "paternity leave": [
+        "paternity",
+        "parental leave",
+        "family leave"
+    ],
+
+    "parental": [
+        "parental leave",
+        "paternity leave",
+        "family leave"
+    ],
+
+    # IT Support
     "password": [
         "credentials",
         "login",
         "account access"
     ],
+
+    "login": [
+        "password",
+        "credentials",
+        "account access"
+    ],
+
+    "credentials": [
+        "password",
+        "login",
+        "account access"
+    ],
+
+    # Billing & Payments
     "refund": [
         "money back",
         "reimbursement",
         "return payment"
     ],
+
+    "payment": [
+        "payment methods",
+        "payment options",
+        "ways to pay",
+        "pay for order"
+    ],
+
+    "pay": [
+        "payment",
+        "payment methods",
+        "payment options",
+        "ways to pay"
+    ],
+
+    "order": [
+        "purchase",
+        "checkout",
+        "payment"
+    ],
+
+    "credit card": [
+        "payment method",
+        "payment option",
+        "Visa",
+        "MasterCard",
+        "American Express"
+    ],
+
+    # Shipping & Delivery
     "tracking": [
         "shipment tracking",
         "delivery status",
         "package status"
     ],
+
     "package": [
         "shipment",
         "parcel",
         "delivery"
+    ],
+
+    "shipment": [
+        "package",
+        "parcel",
+        "delivery"
+    ],
+
+    "delivery": [
+        "shipment",
+        "package",
+        "parcel"
     ]
 }
 
 
 def expand_query_with_synonyms(query: str) -> str:
     """
-    Adds lightweight deterministic semantic terms.
-    No additional LLM call is used.
+    Add deterministic semantic terms to the query.
+
+    This does not use an LLM and therefore does not consume
+    Groq API quota.
     """
 
     query_lower = query.lower()
@@ -109,40 +199,62 @@ def retrieve_context(
     department: str
 ) -> str:
 
+    print(
+        f"[RAG] Retrieving knowledge for "
+        f"department={department}"
+    )
+
     client = get_chroma_client()
 
     try:
         collection = client.get_collection(
             name="shopunow_faqs"
         )
-    except Exception:
+    except Exception as e:
+        print(
+            f"[RAG] Chroma collection error: {e}"
+        )
         return ABSTENTION_MESSAGE
 
     if collection.count() == 0:
+        print("[RAG] Chroma collection is empty.")
         return ABSTENTION_MESSAGE
 
     embeddings_model = get_embeddings_model()
 
+    # Chroma search helper
+
     def search_chroma(search_query: str):
 
-        query_embedding = (
-            embeddings_model.embed_query(
-                search_query
-            )
+        print(
+            f"[RAG] Searching: {search_query}"
         )
 
-        results = collection.query(
-            query_embeddings=[query_embedding],
-            n_results=TOP_K,
-            where={
-                "department": department
-            },
-            include=[
-                "documents",
-                "distances",
-                "metadatas"
-            ]
-        )
+        try:
+            query_embedding = (
+                embeddings_model.embed_query(
+                    search_query
+                )
+            )
+
+            results = collection.query(
+                query_embeddings=[query_embedding],
+                n_results=TOP_K,
+                where={
+                    "department": department
+                },
+                include=[
+                    "documents",
+                    "distances",
+                    "metadatas"
+                ]
+            )
+
+        except Exception as e:
+            print(
+                f"[RAG] Chroma search error: {e}"
+            )
+            return []
 
         if (
             not results.get("documents")
@@ -159,6 +271,10 @@ def retrieve_context(
             documents,
             distances
         ):
+
+            # Convert Chroma distance into a simple
+            # similarity-style score used by the
+            # existing threshold.
             similarity = 1 / (1 + distance)
 
             print(
@@ -173,42 +289,92 @@ def retrieve_context(
 
         return valid_results
 
-    # First use the user's original wording.
-    results = search_chroma(query)
+    # 1. Original query search
+   
+    original_results = search_chroma(query)
 
-    # If no sufficiently relevant result is found,
-    # retry with deterministic semantic terms.
-    if not results:
+    # 2. Deterministic semantic search
+    #
+    # Important:
+    # We perform this even when the original query returns
+    # some results. This improves paraphrase handling.
 
-        expanded_query = (
-            expand_query_with_synonyms(query)
+    expanded_query = expand_query_with_synonyms(query)
+
+    expanded_results = []
+
+    if expanded_query != query:
+
+        print(
+            f"[RAG] Semantic fallback query: "
+            f"{expanded_query}"
         )
 
-        if expanded_query != query:
-            print(
-                f"[RAG] Semantic fallback: "
-                f"{expanded_query}"
-            )
+        expanded_results = search_chroma(
+            expanded_query
+        )
 
-            results = search_chroma(
-                expanded_query
-            )
+    # 3. Combine results
+    #
+    # If the same document appears in both searches,
+    # keep its highest similarity score.
 
-    if not results:
+    combined_results = {}
+
+    for doc, similarity in (
+        original_results + expanded_results
+    ):
+
+        if (
+            doc not in combined_results
+            or similarity > combined_results[doc]
+        ):
+            combined_results[doc] = similarity
+
+    # 4. No sufficiently relevant knowledge
+
+    if not combined_results:
+
+        print(
+            "[RAG] No sufficiently relevant "
+            "knowledge found."
+        )
+
         return ABSTENTION_MESSAGE
 
-       # Remove duplicate documents while preserving order.
-    seen = set()
+    # 5. Rank combined results
+
+    ranked_results = sorted(
+        combined_results.items(),
+        key=lambda item: item[1],
+        reverse=True
+    )
+
+
+    # Keep only the strongest TOP_K documents.
+    ranked_results = ranked_results[:TOP_K]
+
+    # 6. Build context for Groq
+
     context_blocks = []
 
-    for doc, similarity in results:
+    for doc, similarity in ranked_results:
 
-        if doc in seen:
-            continue
+        print(
+            f"[RAG] Selected context "
+            f"Similarity={similarity:.4f}"
+        )
 
-        seen.add(doc)
         context_blocks.append(doc)
 
-    return "\n\n---\n\n".join(
+
+    context = "\n\n---\n\n".join(
         context_blocks
     )
+
+    print(
+        f"[RAG] Context prepared using "
+        f"{len(context_blocks)} document(s)."
+    )
+
+    return context
