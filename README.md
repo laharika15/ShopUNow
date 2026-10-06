@@ -96,7 +96,6 @@ python -m venv venv
 source venv/bin/activate  # On Windows use: venv\Scripts\activate
 pip install -r requirements.txt
 ```
-
 ### 3. Configuration
 Rename the provided environment template:
 ```bash
@@ -109,9 +108,9 @@ TOP_K=3
 RELEVANCE_THRESHOLD=0.35
 ENABLE_REFLECTION=False
 ```
-
 ### 4. Data Generation & Database Initialization
-Since this project minimizes API usage, dataset generation and database initialization are done **once**.
+Generate the dataset once when the knowledge base needs to be created or updated.
+Then run database.py to rebuild the Chroma collection from the current dataset.
 
 Generate the synthetic QA dataset:
 ```bash
@@ -177,7 +176,6 @@ The evaluation validates:
 - Controlled abstention
 - Negative-sentiment escalation
 - Routing behavior
-
 
 ## Technology Stack
 
