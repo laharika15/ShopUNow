@@ -289,9 +289,9 @@ def human_escalation(state: GraphState) -> GraphState:
 
     return {
         "response": (
-            "Your query has been escalated to a "
-            "human support agent. They will reach "
-            "out to you shortly."
+            "I understand that you would like help from a "
+            "ShopUNow support representative. Please provide "
+            "your contact details below so our team can follow up."
         ),
         "needs_escalation": True
     }
