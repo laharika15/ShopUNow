@@ -97,16 +97,46 @@ Determine:
 
 1. SENTIMENT
 
+1. SENTIMENT
+
 Choose exactly one:
 
 - Positive
 - Neutral
 - Negative
 
-Negative means the user is clearly angry, frustrated,
-complaining, or expressing serious dissatisfaction.
+IMPORTANT:
+Sentiment describes the user's emotional attitude,
+NOT the subject of the question.
 
-Do NOT classify a normal question as negative.
+A normal factual question is Neutral.
+
+Examples:
+
+"What is the weather today?"
+→ Neutral
+
+"What is the weather in Surrey?"
+→ Neutral
+
+"How do I reset my password?"
+→ Neutral
+
+"Can I get a refund?"
+→ Neutral
+
+"I am very frustrated with my refund."
+→ Negative
+
+"This is terrible. I have contacted you three times."
+→ Negative
+
+"I want to speak to a manager because nobody is helping me."
+→ Negative
+
+Do NOT classify a question as Negative simply because
+the topic involves a problem, absence, refund, delivery,
+or support request.
 
 2. DEPARTMENT
 
@@ -380,18 +410,21 @@ using ONLY the provided context.
 
 def route_query(state: GraphState) -> str:
 
-    # Genuine human escalation
-    if state["sentiment"].lower() == "negative":
-        return "escalate"
-
-    # Explicitly outside ShopUNow
+    # First determine whether the query belongs
+    # to ShopUNow at all.
     if state["scope"].lower() == "out-of-scope":
         return "out_of_scope"
 
-    # If scope is In-Scope but department is unclear,
-    # do NOT automatically send to a human.
-    #
-    # Let the system provide a safe response instead.
+    # Only escalate when an IN-SCOPE ShopUNow query
+    # is genuinely negative/complaint-oriented.
+    if (
+        state["scope"].lower() == "in-scope"
+        and state["sentiment"].lower() == "negative"
+    ):
+        return "escalate"
+
+    # Unknown department should not automatically
+    # become a human escalation.
     if state["department"] == "Unknown":
         return "out_of_scope"
 
