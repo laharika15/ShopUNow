@@ -1,5 +1,6 @@
 import os
 import json
+from collections import Counter
 from pydantic import BaseModel, Field
 from typing import List
 from langchain_groq import ChatGroq
@@ -10,10 +11,18 @@ load_dotenv()
 
 
 class QAPair(BaseModel):
-    question: str = Field(description="The frequently asked question.")
-    answer: str = Field(description="The detailed answer to the question.")
-    department: str = Field(description="The department responsible for this question.")
-    audience: str = Field(description="The target audience (Internal or External).")
+    question: str = Field(
+        description="The frequently asked question."
+    )
+    answer: str = Field(
+        description="The detailed answer to the question."
+    )
+    department: str = Field(
+        description="The department responsible for this question."
+    )
+    audience: str = Field(
+        description="The target audience (Internal or External)."
+    )
 
 
 class QADataset(BaseModel):
@@ -62,43 +71,50 @@ def generate_dataset():
 You are generating a synthetic FAQ dataset for a fictional
 retail company named ShopUNow.
 
-Create EXACTLY {records_per_department} unique Question and Answer pairs
-for the {dept['name']} department.
+Create EXACTLY {records_per_department} unique Question and Answer
+pairs for the {dept['name']} department.
 
 Department audience: {dept['audience']}
 
 Requirements:
 
 - Return exactly {records_per_department} QA pairs.
-- Every question must be different.
-- Questions should represent realistic customer or employee queries.
-- Include different ways users might ask the same type of question.
+- Every question must be realistic and different.
+- Do not create duplicate or nearly identical questions.
+- Questions should represent realistic employee or customer requests.
 - Use natural conversational wording.
-- Answers must be accurate, helpful, and based only on fictional
+- Use different ways users may express the same intent.
+- Answers must be helpful, accurate, and based only on fictional
   ShopUNow policies.
 - Use concrete fictional ShopUNow details.
 - Do not use placeholders.
 - Keep answers reasonably concise.
-- Do not use markdown tables.
+- Do not include markdown tables.
 - Do not include unnecessary special characters.
 - Do not create questions belonging to another department.
-- Avoid duplicate or nearly identical questions.
 
-Important:
-The dataset will be used for semantic vector search.
-Therefore, use varied wording and realistic synonyms.
+The dataset will be used for semantic vector retrieval.
 
-For example, HR questions may use terms such as:
-PTO, paid time off, vacation, leave, time off, days off.
+Use realistic synonyms and paraphrases.
 
-IT Support questions may use terms such as:
-password reset, login problem, credentials, access, account locked.
+For HR, where appropriate, naturally use terms such as:
+PTO, paid time off, vacation, sick leave, absence,
+personal leave, time-off request, manager approval.
 
-Billing questions may use terms such as:
-refund, reimbursement, money back, charge, payment, invoice.
+For IT Support, where appropriate, use terms such as:
+password reset, login issue, credentials, account access,
+locked account, VPN, software access.
 
-Shipping questions may use terms such as:
-delivery, shipment, tracking, package, parcel, order arrival.
+For Billing & Payments, where appropriate, use terms such as:
+refund, money back, charge, payment, invoice,
+billing issue, duplicate charge.
+
+For Shipping & Delivery, where appropriate, use terms such as:
+delivery, shipment, package, parcel, tracking,
+arrival, missed delivery.
+
+Make sure the answers contain the actual ShopUNow procedure
+or policy that a user would need.
 
 Return ONLY the structured QA dataset.
 """
@@ -112,7 +128,9 @@ Return ONLY the structured QA dataset.
                 result = structured_llm.invoke(prompt)
 
                 if not result or not result.qa_pairs:
-                    raise ValueError("Model returned no QA pairs.")
+                    raise ValueError(
+                        "Model returned no QA pairs."
+                    )
 
                 if len(result.qa_pairs) != records_per_department:
                     raise ValueError(
@@ -129,7 +147,8 @@ Return ONLY the structured QA dataset.
                     )
 
                 all_data.extend(
-                    [item.model_dump() for item in result.qa_pairs]
+                    item.model_dump()
+                    for item in result.qa_pairs
                 )
 
                 print(
@@ -145,38 +164,58 @@ Return ONLY the structured QA dataset.
                 print(f"Attempt {attempt} failed: {e}")
 
         if not success:
-            print(f"ERROR: Could not generate data for {dept['name']}.")
+            print(
+                f"ERROR: Could not generate data "
+                f"for {dept['name']}."
+            )
 
     os.makedirs("./data", exist_ok=True)
 
     dataset_path = "./data/shopunow_qa_dataset.json"
 
-    with open(dataset_path, "w", encoding="utf-8") as f:
-        json.dump(all_data, f, indent=4, ensure_ascii=False)
+    with open(
+        dataset_path,
+        "w",
+        encoding="utf-8"
+    ) as f:
+        json.dump(
+            all_data,
+            f,
+            indent=4,
+            ensure_ascii=False
+        )
+
+    counts = Counter(
+        item["department"]
+        for item in all_data
+    )
 
     print("\n" + "=" * 60)
-    print(f"Dataset generation complete.")
-    print(f"Total records: {len(all_data)}")
-    print(f"Expected records: 80")
-    print(f"Saved to: {dataset_path}")
+    print("DATASET GENERATION COMPLETE")
     print("=" * 60)
+    print(f"Total records: {len(all_data)}")
 
-    # Verify department counts
-    from collections import Counter
+    for dept in departments:
+        print(
+            f"{dept['name']}: "
+            f"{counts.get(dept['name'], 0)}"
+        )
 
-    counts = Counter(item["department"] for item in all_data)
+    print(f"Saved to: {dataset_path}")
 
-    print("\nDepartment counts:")
-    for department in departments:
-        name = department["name"]
-        print(f"{name}: {counts[name]}")
-
-    if len(all_data) == 80 and all(
-        counts[dept["name"]] == 20 for dept in departments
+    if (
+        len(all_data) == 80
+        and all(
+            counts.get(dept["name"], 0) == 20
+            for dept in departments
+        )
     ):
-        print("\nSUCCESS: Dataset contains exactly 80 records.")
+        print("\nSUCCESS: Exactly 80 records generated.")
     else:
-        print("\nWARNING: Dataset does not contain the expected 80 records.")
+        print(
+            "\nWARNING: Dataset does not contain "
+            "exactly 80 records."
+        )
 
 
 if __name__ == "__main__":
