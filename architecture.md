@@ -1,58 +1,65 @@
 # Architecture: ShopUNow Agentic AI Assistant
 
 ## System Overview
-The ShopUNow Agentic AI Assistant is a strong, quota-efficient RAG system built for a retail company. It handles internal employee queries (HR, IT) and external customer queries (Billing, Shipping). The system minimizes API usage by leveraging local Hugging Face embeddings, metadata filtering in ChromaDB, deterministic evaluation, and limiting Groq LLM calls.
 
-## Core Components and Data Flow
+ShopUNow Agentic AI Assistant is a quota-efficient Agentic RAG system designed to support both internal employees and external customers of a retail organization.
 
-1. **User Input**: The user submits a query.
-2. **Query Categorizer (Groq LLM)**: Analyzes the query to determine:
-   - **Sentiment**: Positive, Neutral, or Negative.
-   - **Department**: HR, IT Support, Billing & Payments, Shipping & Delivery, or Unknown.
-3. **Query Router (LangGraph)**: 
-   - **Human Escalation Route**: Triggered if sentiment is Negative OR if the department is Unknown. Returns a simple message indicating a human agent will reach out (stretch goal: interactive form).
-   - **Department-Aware RAG Route**: Triggered if sentiment is Positive/Neutral AND the department is recognized.
-4. **Strong RAG Workflow**:
-   - **Retrieval**: Uses local `sentence-transformers/all-MiniLM-L6-v2` embeddings to query ChromaDB.
-   - **Metadata Filtering**: Strictly filters ChromaDB using the categorized department to prevent cross-department leakage.
-   - **Relevance Check**: Retrieves `TOP_K` candidates and filters them based on a `RELEVANCE_THRESHOLD`.
-   - **Controlled Abstention**: If no context meets the threshold, the system aborts LLM generation and returns: *"I don't have enough information in the ShopUNow knowledge base to answer this accurately."*
-   - **Grounded Generation (Groq LLM)**: If relevant context exists, generates a response using ONLY the provided context.
-   - **Optional Reflection**: If `ENABLE_REFLECTION` is True, a single Groq call reflects on the answer and refines it if necessary.
-5. **Final Response**: The generated answer, abstention message, or human escalation message is returned.
+The system combines:
 
-## Quota Optimization Strategy
-- **Embeddings**: Local Hugging Face models (zero API cost).
-- **Database**: Local ChromaDB instance.
-- **Dataset**: Generated ONCE and saved as `shopunow_qa_dataset.json`.
-- **RAG Generation**: Strict grounding and controlled abstention prevents unnecessary LLM calls when context is poor.
-- **Evaluation**: Mostly deterministic string matching and metadata checks, avoiding LLM-as-a-judge for every test.
-- **Reflection**: Disabled during normal development mode.
+- LangGraph for agent orchestration
+- Groq for intent classification and grounded response generation
+- ChromaDB for vector retrieval
+- Local Hugging Face embeddings for zero-cost semantic search
+- Department-aware metadata filtering
+- Deterministic semantic query expansion
+- Relevance-based controlled abstention
+- Human escalation for genuinely negative or escalation-oriented interactions
+- Optional reflection for answer verification
+- Streamlit for the conversational user interface
+- FastAPI for API access
 
-## Directory Structure
-```
-shopunow/
-├── app.py                   # FastAPI wrapper
-├── main.py                  # CLI test entrypoint
-├── agent.py                 # LangGraph logic (Router, Nodes, State)
-├── database.py              # ChromaDB initialization and population
-├── retrieval.py             # RAG logic (Embeddings, Metadata filtering, Thresholds)
-├── data_generation.py       # Script to generate the QA dataset once
-├── evaluation.py            # Deterministic test suite
-├── config.py                # Environment configuration & constants
-├── data/
-│   └── shopunow_qa_dataset.json # Static QA dataset
-├── architecture.md          # Architecture overview
-├── implementation_plan.md   # Step-by-step plan
-├── README.md                # Project documentation
-├── requirements.txt         # Dependencies
-├── .env.example             # Env var template
-└── .gitignore               # Ignored files
-```
+The architecture is designed to minimize unnecessary LLM calls while maintaining grounded and reliable responses.
 
-## Technology Stack
-- **Agent Orchestration**: LangGraph, LangChain
-- **LLM**: Groq API
-- **Embeddings**: `sentence-transformers/all-MiniLM-L6-v2` (Local Hugging Face)
-- **Vector Store**: ChromaDB (Local)
-- **API Wrapping**: FastAPI
+---
+
+## High-Level Architecture
+
+```mermaid
+graph TD
+
+    A[User Query] --> B[Groq Categorizer]
+
+    B --> C{Scope + Sentiment + Department}
+
+    C -->|Out-of-Scope| D[Out-of-Scope Response]
+
+    C -->|In-Scope + Negative| E[Human Escalation]
+
+    C -->|In-Scope + Known Department| F[Department-Aware RAG]
+
+    F --> G[Original Semantic Retrieval]
+
+    G --> H[Deterministic Semantic Expansion]
+
+    H --> I[Expanded Semantic Retrieval]
+
+    I --> J[Combine + Deduplicate + Rank]
+
+    J --> K[Department Metadata Filter]
+
+    K --> L{Relevance Threshold}
+
+    L -->|Insufficient Evidence| M[Controlled Abstention]
+
+    L -->|Relevant Evidence| N[Groq Grounded Generation]
+
+    N --> O{Reflection Enabled?}
+
+    O -->|Yes| P[Groq Reflection]
+
+    O -->|No| Q[Final Response]
+
+    P --> Q
+    D --> Q
+    E --> Q
+    M --> Q
