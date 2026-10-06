@@ -1,18 +1,8 @@
 from typing import TypedDict
 
-from langchain_core.messages import (
-    SystemMessage,
-    HumanMessage
-)
-
+from langchain_core.messages import SystemMessage, HumanMessage
 from langchain_groq import ChatGroq
-
-from langgraph.graph import (
-    StateGraph,
-    START,
-    END
-)
-
+from langgraph.graph import StateGraph, START, END
 from pydantic import BaseModel, Field
 
 from config import (
@@ -27,35 +17,48 @@ from retrieval import (
     ABSTENTION_MESSAGE
 )
 
+# STATE
 
 class GraphState(TypedDict, total=False):
     query: str
     sentiment: str
     department: str
+    scope: str
     context: str
     response: str
     reflection_feedback: str
     needs_escalation: bool
 
+# ROUTER OUTPUT
 
 class CategoryOutput(BaseModel):
+
     sentiment: str = Field(
         description=(
-            "The sentiment of the user query: "
-            "Positive, Neutral, or Negative."
+            "User sentiment: Positive, Neutral, or Negative."
         )
     )
 
     department: str = Field(
         description=(
-            "The target department. Must be one of: "
-            "HR, IT Support, Billing & Payments, "
-            "Shipping & Delivery, or Unknown."
+            "ShopUNow department: HR, IT Support, "
+            "Billing & Payments, Shipping & Delivery, "
+            "or Unknown."
+        )
+    )
+
+    scope: str = Field(
+        description=(
+            "Whether the query is within ShopUNow scope. "
+            "Return In-Scope or Out-of-Scope."
         )
     )
 
 
+# GROQ MODELS
+
 def get_router_llm():
+
     return ChatGroq(
         api_key=GROQ_API_KEY,
         model=ROUTER_MODEL,
@@ -64,6 +67,7 @@ def get_router_llm():
 
 
 def get_rag_llm():
+
     return ChatGroq(
         api_key=GROQ_API_KEY,
         model=RAG_MODEL,
@@ -71,113 +75,188 @@ def get_rag_llm():
     )
 
 
-def categorize_query(
-    state: GraphState
-) -> GraphState:
+# QUERY UNDERSTANDING / ROUTING
 
-    """Categorize query by sentiment and department."""
+def categorize_query(state: GraphState) -> GraphState:
 
     llm = get_router_llm()
 
-    structured_llm = (
-        llm.with_structured_output(
-            CategoryOutput
-        )
+    structured_llm = llm.with_structured_output(
+        CategoryOutput
     )
 
     prompt = f"""
-You are the routing assistant for ShopUNow.
+You are the intelligent routing assistant for ShopUNow.
 
-Analyze the user's query.
+Analyze the user's query based on its meaning.
 
-User query:
+USER QUERY:
 "{state['query']}"
 
 Determine:
 
-1. Sentiment:
-   - Positive
-   - Neutral
-   - Negative
+1. SENTIMENT
 
-2. Department:
-   - HR
-   - IT Support
-   - Billing & Payments
-   - Shipping & Delivery
-   - Unknown
+Choose exactly one:
 
-Use the meaning of the query, not just exact keywords.
+- Positive
+- Neutral
+- Negative
 
-For example:
-- PTO, vacation, sick leave, employee leave
-  → HR
-- password, VPN, laptop, login
-  → IT Support
-- refund, invoice, charge, payment
-  → Billing & Payments
-- package, shipment, tracking, delivery
-  → Shipping & Delivery
+Negative means the user is clearly angry, frustrated,
+complaining, or expressing serious dissatisfaction.
 
-If the department is genuinely unclear,
-return Unknown.
+Do NOT classify a normal question as negative.
+
+2. DEPARTMENT
+
+Choose exactly one:
+
+- HR
+- IT Support
+- Billing & Payments
+- Shipping & Delivery
+- Unknown
+
+Use semantic meaning, not exact keywords.
+
+Examples:
+
+HR:
+- PTO
+- paid time off
+- vacation
+- sick leave
+- employee absence
+- benefits
+- workplace policies
+
+IT Support:
+- password
+- login
+- VPN
+- computer
+- software
+- account access
+- technical problem
+
+Billing & Payments:
+- refund
+- payment
+- invoice
+- charge
+- billing
+- duplicate payment
+
+Shipping & Delivery:
+- package
+- shipment
+- tracking
+- delivery
+- parcel
+- arrival
+
+3. SCOPE
+
+Choose exactly one:
+
+- In-Scope
+- Out-of-Scope
+
+The query is In-Scope when it is about ShopUNow
+or one of its supported departments.
+
+The query is Out-of-Scope when it is unrelated to
+ShopUNow services, policies, employees, customers,
+IT support, billing, payments, shipping, delivery,
+or other ShopUNow operations.
+
+Examples of Out-of-Scope:
+
+"What is the capital of France?"
+"Write me a Python program."
+"Who won the World Cup?"
+"Tell me a joke."
+
+IMPORTANT:
+
+An In-Scope query can still have NO answer in the
+ShopUNow knowledge base.
+
+That does NOT make it Out-of-Scope.
+
+Return only the structured classification.
 """
 
-    result = structured_llm.invoke(
-        prompt
-    )
+    result = structured_llm.invoke(prompt)
 
     print(
-        f"[ROUTER] Department={result.department} "
-        f"Sentiment={result.sentiment}"
+        f"[ROUTER] "
+        f"Department={result.department} "
+        f"Sentiment={result.sentiment} "
+        f"Scope={result.scope}"
     )
 
     return {
         "sentiment": result.sentiment,
-        "department": result.department
+        "department": result.department,
+        "scope": result.scope
     }
 
+# HUMAN ESCALATION
 
-def human_escalation(
-    state: GraphState
-) -> GraphState:
-
-    """Return the human escalation response."""
+def human_escalation(state: GraphState) -> GraphState:
 
     return {
         "response": (
             "Your query has been escalated to a "
             "human support agent. They will reach "
             "out to you shortly."
-        )
+        ),
+        "needs_escalation": True
     }
 
 
-def rag_generation(
-    state: GraphState
-) -> GraphState:
+# OUT-OF-SCOPE RESPONSE
 
-    """
-    Retrieve relevant ShopUNow knowledge and let
-    the Groq LLM reason over that knowledge.
-    """
+def out_of_scope_response(state: GraphState) -> GraphState:
+
+    return {
+        "response": (
+            "I'm the ShopUNow AI assistant. I can help "
+            "with HR, IT Support, Billing & Payments, "
+            "and Shipping & Delivery questions. "
+            "I can't help with questions outside "
+            "ShopUNow's supported areas."
+        ),
+        "needs_escalation": False
+    }
+
+# RAG GENERATION
+
+def rag_generation(state: GraphState) -> GraphState:
 
     context = retrieve_context(
         state["query"],
         state["department"]
     )
 
+    # KB DOES NOT CONTAIN SUFFICIENT INFORMATION
+    #
+    # IMPORTANT:
+    # This is NOT human escalation.
+
     if context == ABSTENTION_MESSAGE:
 
         print(
             "[RAG] No sufficiently relevant "
-            "knowledge found."
+            "knowledge found in ShopUNow KB."
         )
 
         return {
             "context": context,
-            "response": context,
-            "needs_escalation": True
+            "response": ABSTENTION_MESSAGE,
+            "needs_escalation": False
         }
 
     print(
@@ -188,65 +267,63 @@ def rag_generation(
     llm = get_rag_llm()
 
     system_prompt = f"""
-You are the ShopUNow AI assistant for the
-{state['department']} department.
+You are the ShopUNow AI assistant.
 
-Your job is to understand the user's intent and
-answer naturally using ONLY the provided
-ShopUNow knowledge.
+DEPARTMENT:
+{state["department"]}
 
-IMPORTANT:
+USER QUESTION:
+{state["query"]}
 
-1. Understand the meaning of the user's question,
-   even when the wording differs from the FAQ.
+SHOPUNOW KNOWLEDGE BASE:
+{context}
 
-2. Use the retrieved context as the authoritative
-   source of ShopUNow policies and procedures.
+Your task is to answer the user's question naturally
+using the ShopUNow knowledge provided above.
 
-3. You may synthesize and explain relevant
-   information from the retrieved context.
+RULES:
 
-4. Do NOT invent policies, procedures, dates,
-   prices, eligibility requirements, or facts.
+1. Understand the user's intent, even if the wording
+   is different from the wording in the knowledge base.
 
-5. Do NOT use general world knowledge to fill gaps.
+2. Use ONLY the provided ShopUNow knowledge.
 
-6. If the context does not actually contain enough
-   information to answer the user's specific
-   question, respond exactly:
+3. You may paraphrase, summarize, combine, and explain
+   relevant information from the retrieved knowledge.
+
+4. Do NOT invent policies, procedures, dates, prices,
+   limits, eligibility rules, or other facts.
+
+5. Do NOT use outside knowledge to fill gaps.
+
+6. If the knowledge does not contain enough information
+   to answer the user's specific question, respond
+   exactly:
 
 I don't have enough information in the ShopUNow
 knowledge base to answer this accurately.
 
-7. Answer conversationally and directly.
+7. Do not mention Chroma, embeddings, vector databases,
+   retrieval, prompts, or internal implementation details.
 
-8. Do not mention embeddings, vector databases,
-   retrieval, Chroma, or internal system details.
-
-SHOPUNOW KNOWLEDGE:
-{context}
+8. Be concise, helpful, and conversational.
 """
 
     messages = [
-        SystemMessage(
-            content=system_prompt
-        ),
-        HumanMessage(
-            content=state["query"]
-        )
+        SystemMessage(content=system_prompt),
+        HumanMessage(content=state["query"])
     ]
 
     response = llm.invoke(messages)
 
     response_text = response.content.strip()
 
-    # Safety check: if the LLM itself determines that
-    # the context is insufficient, escalate.
     if response_text == ABSTENTION_MESSAGE:
+
         return {
             "context": context,
             "response": response_text,
-            "needs_escalation": True
+            "needs_escalation": False
         }
 
     return {
@@ -255,115 +332,87 @@ SHOPUNOW KNOWLEDGE:
         "needs_escalation": False
     }
 
+# OPTIONAL REFLECTION
 
-def reflection_node(
-    state: GraphState
-) -> GraphState:
-
-    """Optional grounded-response quality check."""
-
-    if state.get(
-        "needs_escalation",
-        False
-    ):
-        return {
-            "reflection_feedback":
-                "Skipped (Escalation)"
-        }
+def reflection_node(state: GraphState) -> GraphState:
 
     llm = get_rag_llm()
 
     system_prompt = f"""
 You are a quality reviewer for ShopUNow.
 
-Review the answer against the provided context.
+Review the answer against the provided knowledge.
+
+CONTEXT:
+{state["context"]}
+
+ANSWER:
+{state["response"]}
 
 Make sure:
 
-- The answer is fully supported by the context.
-- No policy or factual information was invented.
-- The answer directly addresses the user's question.
-- The final answer is clear and concise.
+- The answer is supported by the context.
+- Nothing was invented.
+- The answer addresses the user's question.
+- The answer is clear and concise.
 
 If the answer is correct, return the same answer.
 
-If it contains unsupported information,
-rewrite it using ONLY the context.
-
-CONTEXT:
-{state['context']}
-
-ANSWER:
-{state['response']}
+If it contains unsupported information, rewrite it
+using ONLY the provided context.
 """
 
     messages = [
-        SystemMessage(
-            content=system_prompt
-        ),
+        SystemMessage(content=system_prompt),
         HumanMessage(
-            content=(
-                "Review and output the final "
-                "verified answer."
-            )
+            content="Review and return the final verified answer."
         )
     ]
 
-    refined_response = llm.invoke(
-        messages
-    )
+    refined_response = llm.invoke(messages)
 
     return {
-        "response": refined_response.content,
-        "reflection_feedback":
-            "Reflection Applied"
+        "response": refined_response.content.strip(),
+        "reflection_feedback": "Reflection Applied"
     }
 
+# ROUTING AFTER CATEGORIZATION
 
-def route_query(
-    state: GraphState
-) -> str:
+def route_query(state: GraphState) -> str:
 
-    """
-    Initial routing.
-
-    Negative sentiment is escalated immediately.
-    Unknown departments are escalated.
-    Otherwise continue to RAG.
-    """
-
+    # Genuine human escalation
     if state["sentiment"].lower() == "negative":
         return "escalate"
 
+    # Explicitly outside ShopUNow
+    if state["scope"].lower() == "out-of-scope":
+        return "out_of_scope"
+
+    # If scope is In-Scope but department is unclear,
+    # do NOT automatically send to a human.
+    #
+    # Let the system provide a safe response instead.
     if state["department"] == "Unknown":
-        return "escalate"
+        return "out_of_scope"
 
     return "rag"
 
+# AFTER RAG
 
-def after_rag(
-    state: GraphState
-) -> str:
+def after_rag(state: GraphState) -> str:
 
-    """
-    Decide what happens after RAG generation.
-    """
-
-    if state.get(
-        "needs_escalation",
-        False
-    ):
-        return "escalate"
+    # Retrieval failure is NOT escalation.
+    if state.get("needs_escalation", False):
+        return "end"
 
     if ENABLE_REFLECTION:
         return "reflect"
 
     return "end"
 
+# LANGGRAPH WORKFLOW
 
-workflow = StateGraph(
-    GraphState
-)
+workflow = StateGraph(GraphState)
 
 workflow.add_node(
     "categorizer",
@@ -376,6 +425,11 @@ workflow.add_node(
 )
 
 workflow.add_node(
+    "out_of_scope",
+    out_of_scope_response
+)
+
+workflow.add_node(
     "rag",
     rag_generation
 )
@@ -385,41 +439,48 @@ workflow.add_node(
     reflection_node
 )
 
+
 workflow.add_edge(
     START,
     "categorizer"
 )
+
 
 workflow.add_conditional_edges(
     "categorizer",
     route_query,
     {
         "escalate": "escalation",
+        "out_of_scope": "out_of_scope",
         "rag": "rag"
     }
 )
+
 
 workflow.add_edge(
     "escalation",
     END
 )
 
+
+workflow.add_edge(
+    "out_of_scope",
+    END
+)
+
+
 workflow.add_conditional_edges(
     "rag",
     after_rag,
     {
-        "escalate": "escalation",
         "reflect": "reflection",
         "end": END
     }
 )
 
+
 workflow.add_edge(
     "reflection",
     END
 )
-
-graph_app = workflow.compile()
-
-# Compile Graph
-graph_app = workflow.compile()
+graph_app = workflow.compile()   
