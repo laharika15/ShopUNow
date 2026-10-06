@@ -1,37 +1,77 @@
 # ShopUNow Agentic AI Assistant
 
-### Live Demo: https://shopunow-demo-assistant.streamlit.app
-
 ## Overview
-ShopUNow Agentic AI Assistant is an intelligent, quota-efficient Retrieval-Augmented Generation (RAG) system built to serve both internal employees and external customers for a retail company. It routes queries to specific departmental knowledge bases (HR, IT Support, Billing & Payments, Shipping & Delivery) or escalates negative/unknown queries to human support agents.
 
-This project was built as a capstone project focusing on Agentic RAG, LangGraph routing, strict LLM grounding, and deterministic evaluation, all while heavily optimizing for free-tier LLM API usage.
+ShopUNow Agentic AI Assistant is a quota-efficient Agentic Retrieval-Augmented Generation (RAG) system designed to support both internal employees and external customers of a retail organization.
+
+The assistant handles questions across four departments:
+
+- HR
+- IT Support
+- Billing & Payments
+- Shipping & Delivery
+
+The system combines LangGraph-based agent orchestration, Groq LLMs, ChromaDB, local Hugging Face embeddings, department-aware retrieval, deterministic semantic query expansion, controlled abstention, and human escalation.
+
+The project was built with a strong focus on:
+
+- Grounded RAG
+- Hallucination prevention
+- Conversational query handling
+- Department-aware retrieval
+- Human escalation
+- Controlled abstention
+- Free-tier / quota-efficient development
+
+## Live Demo
+
+Try the deployed Streamlit application:
+
+https://shopunow-demo-assistant.streamlit.app
+
+The application provides a conversational interface for interacting with the ShopUNow agent.
 
 ## System Architecture
 
 ```mermaid
 graph TD
+
     A[User Query] --> B[Groq Categorizer]
-    B -->|Sentiment + Department| C{Query Router}
 
-    C -->|Negative OR Unknown| D[Human Escalation]
-    C -->|Positive/Neutral + Known| E[Department-Aware Retrieval]
+    B --> C{Scope + Sentiment + Department}
 
-    E --> F[(ChromaDB + Local Hugging Face Embeddings)]
-    F -->|Department Metadata Filter| E
+    C -->|Out-of-Scope| D[Out-of-Scope Response]
 
-    E --> G{Relevance Threshold}
+    C -->|In-Scope + Negative| E[Human Escalation]
 
-    G -->|Below Threshold| H[Controlled Abstention]
-    G -->|Above Threshold| I[Groq RAG Generation]
+    C -->|In-Scope + Known Department| F[Department-Aware RAG]
 
-    I --> J{Reflection Enabled?}
-    J -->|Yes| K[Groq Reflection]
-    J -->|No| L[Final Response]
+    F --> G[Original Semantic Retrieval]
 
-    K --> L
-    H --> L
-    D --> L
+    G --> H[Deterministic Semantic Expansion]
+
+    H --> I[Expanded Semantic Retrieval]
+
+    I --> J[Combine + Deduplicate + Rank]
+
+    J --> K[Department Metadata Filter]
+
+    K --> L{Relevance Threshold}
+
+    L -->|Insufficient Evidence| M[Controlled Abstention]
+
+    L -->|Relevant Evidence| N[Groq Grounded Generation]
+
+    N --> O{Reflection Enabled?}
+
+    O -->|Yes| P[Groq Reflection]
+
+    O -->|No| Q[Final Response]
+
+    P --> Q
+    D --> Q
+    E --> Q
+    M --> Q
 ```
 The system uses a graph-based workflow powered by LangGraph:
 1. **Categorization**: The user query is sent to a Groq LLM to determine the sentiment (Positive/Neutral/Negative) and the target Department.
