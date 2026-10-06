@@ -197,14 +197,18 @@ def retrieve_context(
     if not results:
         return ABSTENTION_MESSAGE
 
-    # Remove duplicate documents while preserving order.
+       # Remove duplicate documents while preserving order.
     seen = set()
     context_blocks = []
 
     for doc, similarity in results:
 
-    if doc in seen:
-        continue
+        if doc in seen:
+            continue
 
-    seen.add(doc)
-    context_blocks.append(doc)
+        seen.add(doc)
+        context_blocks.append(doc)
+
+    return "\n\n---\n\n".join(
+        context_blocks
+    )
