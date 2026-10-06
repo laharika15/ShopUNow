@@ -1,290 +1,489 @@
 [
-    {
-        "question": "What is the process for applying for a vacation day at ShopUNow?",
-        "answer": "To request a vacation day, log into the ShopUNow HR portal and navigate to the Leave Request section. Select the desired date(s), choose \"Vacation\" as the leave type, and submit. Your immediate manager will receive a notification and must approve the request within 48 hours. Once approved, the portal will update your leave balance and the calendar will reflect your absence. If you need to adjust dates after approval, submit a new request and the manager will review it again.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "How does ShopUNow handle health insurance for full\u2011time employees?",
-        "answer": "Full\u2011time employees are automatically enrolled in ShopUNow\u2019s Group Health Plan, which includes medical, dental, and vision coverage. The plan is funded 70% by the company and 30% by the employee through payroll deductions. You can view your plan details and claim status in the HR portal under Benefits. For any questions about coverage limits or provider networks, contact the benefits team at benefits@shopunow.com.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "What are the guidelines for remote work eligibility?",
-        "answer": "ShopUNow allows remote work for employees who have completed at least 12 months of continuous service and whose roles can be performed off\u2011site. To apply, submit a Remote Work Request via the HR portal, detailing your proposed schedule and home office setup. Your manager and the IT department will review the request. Approved employees receive a stipend for home office equipment and must attend quarterly virtual check\u2011ins.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "How can I access my performance review feedback?",
-        "answer": "After each performance review cycle, your manager uploads feedback to the HR portal. Log in, go to the Performance section, and click on the most recent review. You will see a summary of strengths, areas for improvement, and any action items. If you have questions, schedule a meeting with your manager through the portal\u2019s calendar feature.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "What is the policy on overtime pay for retail associates?",
-        "answer": "Retail associates who work beyond their scheduled 40 hours per week are eligible for overtime at 1.5 times their regular hourly rate. Overtime must be pre\u2011approved by the store manager and recorded in the time\u2011tracking system. Unapproved overtime will not be compensated. For any disputes, contact the payroll office at payroll@shopunow.com.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "How do I enroll in the ShopUNow Employee Assistance Program?",
-        "answer": "The Employee Assistance Program (EAP) is available to all employees and offers confidential counseling, financial planning, and legal advice. To enroll, go to the Benefits section of the HR portal, select EAP, and complete the short enrollment form. Once enrolled, you will receive a welcome packet with contact information and usage guidelines.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "What steps should I take if I notice a violation of the code of conduct?",
-        "answer": "If you observe a potential code of conduct violation, report it immediately through the anonymous Hotline at 1-800-555-1234 or via the HR portal\u2019s Confidential Report form. All reports are investigated by the Compliance Team, and the identity of the reporter is protected. You will receive a summary of the outcome if you consent to be informed.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "Can I transfer to a different store location?",
-        "answer": "Store transfers are considered on a case\u2011by\u2011case basis. Submit a Transfer Request through the HR portal, including your preferred location and reason for transfer. The HR and Store Operations teams will review the request, taking into account staffing needs and your performance record. If approved, you will receive a transfer notice and a new schedule within two weeks.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "What is the policy on employee referrals?",
-        "answer": "ShopUNow offers a referral bonus of $1,000 for each successful hire referred by an employee. To submit a referral, use the Referral Form in the HR portal, providing the candidate\u2019s resume and a brief note on why they\u2019re a good fit. Once the candidate is hired and completes 90 days of employment, the bonus will be added to your next payroll.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "How do I update my personal contact information in the HR system?",
-        "answer": "Log into the HR portal, navigate to My Profile, and click \"Edit Personal Info.\" Update your phone number, email, and emergency contact details. Save changes, and the system will send a confirmation email. If you encounter any issues, contact HR support at hr@shopunow.com.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "What training resources are available for career development?",
-        "answer": "ShopUNow provides a Learning Management System (LMS) with courses on leadership, customer service, and product knowledge. Access the LMS via the HR portal, select the \"Career Development\" tab, and enroll in courses that match your career goals. Managers can also recommend specific training modules during performance reviews.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "How does ShopUNow handle payroll deductions for union dues?",
-        "answer": "Employees who are members of a union can opt to have union dues deducted from their paycheck. To set this up, complete the Union Dues Authorization form in the HR portal. The payroll team will process the deduction each pay period and provide a statement in your pay stub. If you wish to cancel, submit a new authorization form.",
-        "department": "HR",
-        "audience": "Internal"
-    },
-    {
-        "question": "How do I reset my ShopUNow employee VPN password?",
-        "answer": "To reset your VPN password, log in to the ShopUNow Employee Portal and navigate to \"Account Settings\" > \"Security\". Click \"Reset VPN Password\" and follow the on-screen instructions. You will receive a temporary password via the corporate email you used to register. Use this temporary password to log in, then set a new password that meets the company policy (minimum 12 characters, at least one uppercase, one lowercase, one number, and one special character).",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "What should I do if my laptop is running slow after the latest Windows update?",
-        "answer": "First, run the built\u2011in Windows Troubleshooter: Settings > System > Troubleshoot > Additional troubleshooters > \"Performance\". If the issue persists, check for pending updates and install them. Then, open Task Manager and look for processes consuming >30% CPU or memory; end any unnecessary ones. Finally, run a disk cleanup (type \"cleanmgr\" in the Start menu) and defragment the hard drive if it\u2019s an HDD. If the laptop remains sluggish, contact IT for a hardware check or a possible replacement.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "How can I access the ShopUNow internal wiki from my mobile device?",
-        "answer": "Download the ShopUNow Wiki app from the Apple App Store or Google Play Store. Log in using your corporate credentials (single sign\u2011on). Once authenticated, you can view, edit, and search wiki pages just like on the desktop. If you encounter sync issues, clear the app cache or reinstall the app.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "I received a phishing email claiming to be from the Finance department. What steps should I take?",
-        "answer": "Do not click any links or download attachments. Mark the email as \"Phishing\" in Outlook by selecting the email and clicking the \"Report\" button. Then forward the email to it-support@shopunow.com with the subject line \"Phishing Report \u2013 Finance Department\". IT will investigate and take necessary action. Remember, legitimate internal emails never ask for passwords or sensitive data via email.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "How do I set up a shared printer for the Marketing team?",
-        "answer": "Connect the printer to the office network and ensure it\u2019s powered on. In the IT portal, go to \"Devices\" > \"Printers\" and click \"Add Printer\". Enter the printer\u2019s IP address (e.g., 192.168.1.45) and select the appropriate driver. Under \"Shared Users\", add the Marketing team\u2019s group (Marketing_Users). Once saved, team members can install the printer from their computers by selecting \"Add a printer or scanner\" and choosing the shared printer from the list.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "What is the procedure for requesting a new software license for a design tool?",
-        "answer": "Submit a Software License Request Form via the IT Service Desk portal. Include the software name, version, number of seats, and justification. Once approved by the IT Manager, the license will be added to your account and you\u2019ll receive an email with activation instructions. If you need a trial, request a temporary license and IT will provide a 30\u2011day trial key.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "My email client is not syncing new messages. How can I fix it?",
-        "answer": "First, check your internet connection. Then, in Outlook, go to File > Account Settings > Account Settings. Select your account and click \"Repair\". If that fails, delete the OST file located at C:\\Users\\<username>\\AppData\\Local\\Microsoft\\Outlook and restart Outlook; it will recreate the file. If the problem persists, contact IT to verify your mailbox quota and server status.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "How do I enable two\u2011factor authentication for my ShopUNow account?",
-        "answer": "Navigate to the ShopUNow Employee Portal and select \"Security Settings\". Click \"Enable Two\u2011Factor Authentication\" and choose your preferred method: authenticator app (Google Authenticator or Microsoft Authenticator) or SMS. Follow the on\u2011screen QR code scan or phone number verification. Once enabled, you\u2019ll be prompted for a second factor on all logins.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "I need to backup my project files to the company cloud. What steps should I follow?",
-        "answer": "Open the ShopUNow Cloud Drive (OneDrive for Business). Create a new folder named after your project (e.g., \"ProjectX_2026\"). Drag and drop your files into this folder. Ensure the folder is shared with your project team by right\u2011clicking the folder, selecting \"Share\", and adding the relevant team members. For large files, use the \"Upload\" button to avoid timeouts.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "Why am I receiving repeated error 0x80070005 when installing updates?",
-        "answer": "Error 0x80070005 indicates a permissions issue. Run the Windows Update Troubleshooter: Settings > Update & Security > Troubleshoot > Additional troubleshooters > \"Windows Update\". If the issue remains, open Command Prompt as administrator and run \"sfc /scannow\" to repair system files. After completion, restart the computer and try the update again. If it still fails, contact IT for a manual patch installation.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "How can I configure my laptop to automatically lock after 15 minutes of inactivity?",
-        "answer": "Open Settings > Personalization > Lock screen > Screen timeout settings. Set \"Screen timeout (on battery)\" and \"Screen timeout (plugged in)\" to 15 minutes. Additionally, go to Settings > Accounts > Sign-in options and enable \"Require sign-in after PC wakes up\". This ensures your laptop locks automatically after inactivity.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "What should I do if I suspect a coworker is accessing my shared folder without permission?",
-        "answer": "First, review the folder\u2019s access permissions in the SharePoint admin center. Remove any unauthorized users and set the correct permissions for the intended group. Then, log a security incident in the IT Service Desk portal with details of the suspected breach. IT will audit access logs and take further action if necessary.",
-        "department": "IT Support",
-        "audience": "Internal"
-    },
-    {
-        "question": "How do I view my recent invoices on ShopUNow?",
-        "answer": "Log in to your ShopUNow account, go to the \"Orders\" tab, and click on the \"Invoices\" sub\u2011section. Here you\u2019ll see a list of all invoices, with dates, amounts, and status. Click any invoice to download a PDF or email it to yourself.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "What payment methods does ShopUNow accept for my subscription?",
-        "answer": "ShopUNow accepts major credit cards (Visa, MasterCard, American Express), debit cards, PayPal, and Apple Pay. For corporate accounts, we also support ACH transfers and wire payments. You can add or change your payment method in the \"Billing Settings\" page.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "I was charged twice for the same order. How can I get a refund?",
-        "answer": "First, check the order history to confirm the duplicate charge. If it\u2019s a duplicate, contact our support team via the chat widget or email support@shopunow.com. Provide the order ID, transaction ID, and a screenshot of the duplicate charge. We\u2019ll investigate and issue a refund within 3\u20135 business days.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "Can I set up automatic recurring payments for my monthly subscription?",
-        "answer": "Yes. In the \"Billing Settings\" page, toggle the \"Auto\u2011Renew\" option for your subscription. You can also set a reminder email a week before renewal. If you wish to pause or cancel, simply turn off auto\u2011renew and the subscription will end at the current billing cycle\u2019s end.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "What is the refund policy for digital products purchased on ShopUNow?",
-        "answer": "Digital products are non\u2011refundable once downloaded. However, if the product is defective or not as described, you can request a refund within 7 days of purchase by contacting support with your order ID and a brief explanation. We\u2019ll review and respond within 48 hours.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "How do I update my billing address?",
-        "answer": "Navigate to \"Account Settings\" > \"Billing Address\". Enter the new address and click \"Save Changes\". The new address will apply to all future invoices and shipping labels. If you have an active subscription, the billing address will be updated immediately.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "I received a partial refund that doesn\u2019t match the original amount. What should I do?",
-        "answer": "Check the refund email for the transaction ID. If the amount differs, it may be due to a promotional discount or a partial return. Contact support with the order ID and refund ID; we\u2019ll reconcile the discrepancy and issue the correct amount if needed.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "Can I pay my invoice in installments?",
-        "answer": "ShopUNow offers a 3\u2011month installment plan for invoices over $200. To enroll, go to the invoice page, click \"Pay in Installments\", and follow the prompts. You\u2019ll receive a schedule and automatic payments will be charged to your chosen card each month.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "What should I do if my credit card was declined during checkout?",
-        "answer": "Verify that the card has sufficient funds and that the billing address matches the one on file. If the issue persists, try a different card or use PayPal. If you\u2019re still unable to complete the purchase, contact your bank or reach out to support@shopunow.com for assistance.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "How can I export my purchase history for tax purposes?",
-        "answer": "In the \"Orders\" section, click \"Export History\". Choose the date range and file format (CSV or PDF). The exported file will include order IDs, dates, amounts, and tax details, ready for your accountant.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "Is there a discount for paying annually instead of monthly?",
-        "answer": "Yes, paying annually saves 15% compared to the monthly rate. To switch, go to \"Billing Settings\", select the annual plan, and confirm the payment. The discount will apply to the next billing cycle and you\u2019ll receive a new invoice reflecting the savings.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "How do I dispute a charge that I don\u2019t recognize?",
-        "answer": "If you see an unfamiliar charge, first check your order history. If it\u2019s still unclear, open a dispute ticket via the chat widget or email support@shopunow.com with the transaction ID and a brief description. We\u2019ll investigate with the payment processor and resolve the issue within 7 business days.",
-        "department": "Billing & Payments",
-        "audience": "External"
-    },
-    {
-        "question": "What shipping options does ShopUNow offer for my order?",
-        "answer": "ShopUNow offers three shipping options: Standard (5\u20137 business days), Express (2\u20133 business days), and Same\u2011Day (available in the 100\u2011mile radius of our main warehouse in Seattle). Standard shipping is free for orders over $75, while Express and Same\u2011Day are charged at checkout. You can select your preferred option during the checkout process or change it in your order summary before finalizing the purchase.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "How can I track my shipment once it has shipped?",
-        "answer": "After your order ships, you will receive a confirmation email with a tracking number and a link to the carrier\u2019s website. You can also log into your ShopUNow account, go to \"My Orders,\" and click the \"Track Package\" button next to the relevant order. The tracking status updates in real time and will notify you of any delays or delivery confirmations.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "What happens if I\u2019m not home when my package arrives?",
-        "answer": "If you\u2019re not available, the carrier will leave a delivery notice with instructions for a re\u2011delivery or pickup at a nearby UPS Store. For Same\u2011Day deliveries, you can request a delivery window by contacting our support team within 24 hours of the scheduled arrival. If you prefer, you can also authorize a trusted neighbor to accept the package by adding their name in the delivery instructions field during checkout.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "Can I change my shipping address after placing an order?",
-        "answer": "You can change your shipping address within 2 hours of placing the order by logging into your account and editing the address in the order details page. After that window, the address is locked to prevent shipping errors. If you need to change the address after the 2\u2011hour window, please contact our customer support at 1\u2011800\u2011SHOP\u2011NOW and we\u2019ll do our best to accommodate the request before the order ships.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "What is ShopUNow\u2019s return policy for items that arrive damaged?",
-        "answer": "If your item arrives damaged, please take a photo of the damage and the packaging, then contact our support team within 48 hours of delivery. We will issue a prepaid return label and arrange for a replacement or refund. The return shipping cost is covered by ShopUNow for damaged items, and we\u2019ll process the refund or replacement within 5 business days of receiving the returned product.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "Do you ship internationally?",
-        "answer": "Yes, ShopUNow ships to Canada, Mexico, and the United Kingdom. International orders are processed with DHL Express and typically arrive within 7\u201310 business days. Shipping fees vary by destination and weight, and customs duties are the responsibility of the recipient. You can view the estimated international shipping cost during checkout.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "What should I do if my package is delayed?",
-        "answer": "If your package is delayed, first check the tracking information for any updates. If the status shows \u201cDelayed\u201d or \u201cOut for Delivery\u201d but hasn\u2019t changed for 24 hours, contact our support team with your order number. We\u2019ll investigate with the carrier and provide an updated ETA. In rare cases, weather or carrier logistics can cause delays, and we\u2019ll keep you informed throughout the process.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "Can I choose a pickup location instead of home delivery?",
-        "answer": "ShopUNow offers in\u2011store pickup at all our retail locations. During checkout, select the \u201cPickup\u201d option and choose your preferred store. You\u2019ll receive a pickup confirmation email, and the item will be ready for collection within 24 hours of order confirmation. If you need to change the pickup location, you can do so in your account under the order details page.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "What is the estimated delivery time for a Standard shipment to Denver?",
-        "answer": "For Standard shipping to Denver, the estimated delivery window is 5\u20137 business days from the date the order ships. If you place your order before 12:00\u202fPM PST on a Monday, you can expect delivery by the end of the week. Tracking updates will be available once the package leaves our Seattle warehouse.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "How do I cancel a shipment that hasn\u2019t shipped yet?",
-        "answer": "To cancel an order that hasn\u2019t shipped, log into your ShopUNow account, go to \"My Orders,\" and click the \"Cancel Order\" button next to the relevant order. If the order is still in the processing stage, we\u2019ll cancel it immediately and issue a full refund. If the order has already shipped, you\u2019ll need to follow the return process once you receive the package.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "Do you offer free shipping for first\u2011time customers?",
-        "answer": "Yes, first\u2011time customers receive free Standard shipping on orders over $50. This promotion is automatically applied at checkout. For orders below $50, a flat $5.99 Standard shipping fee applies. Express and Same\u2011Day shipping are not included in the free shipping promotion.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    },
-    {
-        "question": "What happens if I miss the delivery window for Same\u2011Day shipping?",
-        "answer": "If you miss the delivery window for Same\u2011Day shipping, the carrier will leave a delivery notice and attempt a second delivery within the next 24 hours. If you\u2019re still unavailable, you can schedule a pickup at a nearby UPS Store or request a reschedule by contacting our support team. We\u2019ll do our best to accommodate your schedule while ensuring the package remains secure.",
-        "department": "Shipping & Delivery",
-        "audience": "External"
-    }
+  {
+    "question": "What is the process for applying for a vacation day at ShopUNow?",
+    "answer": "To request a vacation day, log into the ShopUNow HR portal and navigate to the Leave Request section. Select the desired date(s), choose \"Vacation\" as the leave type, and submit. Your immediate manager will receive a notification and must approve the request within 48 hours. Once approved, the portal will update your leave balance and the calendar will reflect your absence. If you need to adjust dates after approval, submit a new request and the manager will review it again.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How does ShopUNow handle health insurance for full-time employees?",
+    "answer": "Full-time employees are automatically enrolled in ShopUNow's Group Health Plan, which includes medical, dental, and vision coverage. The plan is funded 70% by the company and 30% by the employee through payroll deductions. You can view your plan details and claim status in the HR portal under Benefits. For any questions about coverage limits or provider networks, contact the benefits team at benefits@shopunow.com.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "What are the guidelines for remote work eligibility?",
+    "answer": "ShopUNow allows remote work for employees who have completed at least 12 months of continuous service and whose roles can be performed off-site. To apply, submit a Remote Work Request via the HR portal, detailing your proposed schedule and home office setup. Your manager and the IT department will review the request. Approved employees receive a stipend for home office equipment and must attend quarterly virtual check-ins.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How can I access my performance review feedback?",
+    "answer": "After each performance review cycle, your manager uploads feedback to the HR portal. Log in, go to the Performance section, and click on the most recent review. You will see a summary of strengths, areas for improvement, and any action items. If you have questions, schedule a meeting with your manager through the portal's calendar feature.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "What is the policy on overtime pay for retail associates?",
+    "answer": "Retail associates who work beyond their scheduled 40 hours per week are eligible for overtime at 1.5 times their regular hourly rate. Overtime must be pre-approved by the store manager and recorded in the time-tracking system. Unapproved overtime will not be compensated. For any disputes, contact the payroll office at payroll@shopunow.com.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How do I enroll in the ShopUNow Employee Assistance Program?",
+    "answer": "The Employee Assistance Program (EAP) is available to all employees and offers confidential counseling, financial planning, and legal advice. To enroll, go to the Benefits section of the HR portal, select EAP, and complete the short enrollment form. Once enrolled, you will receive a welcome packet with contact information and usage guidelines.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "What steps should I take if I notice a violation of the code of conduct?",
+    "answer": "If you observe a potential code of conduct violation, report it immediately through the anonymous Hotline at 1-800-555-1234 or via the HR portal's Confidential Report form. All reports are investigated by the Compliance Team, and the identity of the reporter is protected. You will receive a summary of the outcome if you consent to be informed.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "Can I transfer to a different store location?",
+    "answer": "Store transfers are considered on a case-by-case basis. Submit a Transfer Request through the HR portal, including your preferred location and reason for transfer. The HR and Store Operations teams will review the request, taking into account staffing needs and your performance record. If approved, you will receive a transfer notice and a new schedule within two weeks.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "What is the policy on employee referrals?",
+    "answer": "ShopUNow offers a referral bonus of $1,000 for each successful hire referred by an employee. To submit a referral, use the Referral Form in the HR portal, providing the candidate's resume and a brief note on why they're a good fit. Once the candidate is hired and completes 90 days of employment, the bonus will be added to your next payroll.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How do I update my personal contact information in the HR system?",
+    "answer": "Log into the HR portal, navigate to My Profile, and click \"Edit Personal Info.\" Update your phone number, email, and emergency contact details. Save changes, and the system will send a confirmation email. If you encounter any issues, contact HR support at hr@shopunow.com.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "What training resources are available for career development?",
+    "answer": "ShopUNow provides a Learning Management System (LMS) with courses on leadership, customer service, and product knowledge. Access the LMS via the HR portal, select the \"Career Development\" tab, and enroll in courses that match your career goals. Managers can also recommend specific training modules during performance reviews.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How does ShopUNow handle payroll deductions for union dues?",
+    "answer": "Employees who are members of a union can opt to have union dues deducted from their paycheck. To set this up, complete the Union Dues Authorization form in the HR portal. The payroll team will process the deduction each pay period and provide a statement in your pay stub. If you wish to cancel, submit a new authorization form.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+
+  {
+    "question": "How do I apply for PTO at ShopUNow?",
+    "answer": "To request PTO, log into the ShopUNow HR portal and navigate to the Leave Request section. Select the desired date or dates, choose \"Vacation\" as the leave type, and submit the request. Your immediate manager will receive a notification and must approve the request within 48 hours. Once approved, your leave balance and absence calendar will be updated.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "Where can I submit a paid time off request?",
+    "answer": "Paid time off requests are submitted through the ShopUNow HR portal. Open the Leave Request section, select the dates you need, choose the appropriate leave type, and submit the request. Your manager will review the request and must approve it before the leave is recorded.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How far in advance should I request vacation time?",
+    "answer": "ShopUNow employees should submit vacation requests through the HR portal before taking leave. The request is routed to the immediate manager for approval, and managers are expected to respond within 48 hours. Employees should submit requests as early as practical to allow time for scheduling.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How can I check my remaining vacation balance?",
+    "answer": "Log into the ShopUNow HR portal and open the Leave Request section. Your current leave balance is displayed there. Approved vacation requests are automatically reflected in the balance after manager approval.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "Who approves my vacation request?",
+    "answer": "Your immediate manager approves vacation requests submitted through the ShopUNow HR portal. The manager receives a notification when you submit the request and is expected to approve or review it within 48 hours.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "Can I change my vacation dates after my request is approved?",
+    "answer": "Yes. If you need to change dates after approval, submit a new leave request through the HR portal. Your manager will review the new request again.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How do I find my employee benefits information?",
+    "answer": "Log into the ShopUNow HR portal and open the Benefits section. Full-time employees can view Group Health Plan information, including medical, dental, and vision coverage. The benefits team can answer questions about coverage limits and provider networks.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+  {
+    "question": "How can I request a work-from-home arrangement?",
+    "answer": "Employees who have completed at least 12 months of continuous service and whose roles can be performed off-site can submit a Remote Work Request through the HR portal. Include your proposed schedule and home office setup. The request is reviewed by your manager and IT.",
+    "department": "HR",
+    "audience": "Internal"
+  },
+
+  {
+    "question": "How do I reset my ShopUNow employee VPN password?",
+    "answer": "To reset your VPN password, log in to the ShopUNow Employee Portal and navigate to \"Account Settings\" > \"Security\". Click \"Reset VPN Password\" and follow the on-screen instructions. You will receive a temporary password via the corporate email you used to register. Use this temporary password to log in, then set a new password that meets the company policy.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "What should I do if my laptop is running slow after the latest Windows update?",
+    "answer": "First, run the built-in Windows Troubleshooter. If the issue persists, check for pending updates and install them. Then, open Task Manager and look for processes consuming excessive CPU or memory. Run disk cleanup and contact IT for a hardware check if the laptop remains slow.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "How can I access the ShopUNow internal wiki from my mobile device?",
+    "answer": "Download the ShopUNow Wiki app from the Apple App Store or Google Play Store. Log in using your corporate credentials through single sign-on. Once authenticated, you can view, edit, and search wiki pages from your mobile device.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "I received a phishing email claiming to be from the Finance department. What steps should I take?",
+    "answer": "Do not click links or download attachments. Mark the email as \"Phishing\" in Outlook using the Report button. Then forward the email to it-support@shopunow.com with the subject line \"Phishing Report – Finance Department.\" IT will investigate.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "How do I set up a shared printer for the Marketing team?",
+    "answer": "Connect the printer to the office network and ensure it is powered on. In the IT portal, go to \"Devices\" > \"Printers\" and select \"Add Printer.\" Enter the printer's IP address and appropriate driver, then add the Marketing_Users group under shared users.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "What is the procedure for requesting a new software license for a design tool?",
+    "answer": "Submit a Software License Request Form through the IT Service Desk portal. Include the software name, version, number of seats, and business justification. After IT Manager approval, the license will be added to your account.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "My email client is not syncing new messages. How can I fix it?",
+    "answer": "Check your internet connection first. In Outlook, open File > Account Settings and select Repair for your account. If the problem continues, contact IT so they can verify your mailbox quota and server status.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "How do I enable two-factor authentication for my ShopUNow account?",
+    "answer": "Navigate to the ShopUNow Employee Portal and select Security Settings. Choose \"Enable Two-Factor Authentication\" and select an authenticator app or SMS. Follow the verification instructions to complete setup.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "I need to backup my project files to the company cloud. What steps should I follow?",
+    "answer": "Open ShopUNow Cloud Drive (OneDrive for Business) and create a project folder. Upload your files and share the folder with the relevant project team members. For large files, use the Upload button.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "Why am I receiving repeated error 0x80070005 when installing updates?",
+    "answer": "Error 0x80070005 indicates a permissions issue. Run the Windows Update Troubleshooter. If the issue remains, run \"sfc /scannow\" from an administrator Command Prompt, restart the computer, and try the update again. Contact IT if the problem continues.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "How can I configure my laptop to automatically lock after 15 minutes of inactivity?",
+    "answer": "Open Settings > Personalization > Lock screen > Screen timeout settings and set the screen timeout to 15 minutes for both battery and plugged-in use. Also enable the requirement for sign-in after the computer wakes.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "What should I do if I suspect a coworker is accessing my shared folder without permission?",
+    "answer": "Review the folder's access permissions and remove unauthorized users. Then log a security incident through the IT Service Desk with details of the suspected access. IT will audit access logs and investigate.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+
+  {
+    "question": "How do I reset my ShopUNow account password?",
+    "answer": "Open the ShopUNow Employee Portal and go to Account Settings > Security. Use the password reset option and follow the verification instructions. Your new password must meet ShopUNow's password requirements.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "What should I do if I cannot connect to the company Wi-Fi?",
+    "answer": "First verify that Wi-Fi is enabled on your device and reconnect to the ShopUNow network. Restart the device if necessary. If you still cannot connect, contact the IT Service Desk so they can check your account and the network connection.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "How can I request access to an internal application?",
+    "answer": "Submit an access request through the IT Service Desk portal. Include the application name, your business justification, and the access level required. IT will review the request and provide access after approval.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "What should I do if my employee account is locked?",
+    "answer": "If your ShopUNow employee account is locked, use the account recovery option in the Employee Portal. If self-service recovery is unavailable, contact the IT Service Desk for assistance with unlocking the account.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "How do I request a replacement company laptop?",
+    "answer": "Submit a hardware support request through the IT Service Desk portal. Describe the problem with your current laptop and include your device information. IT will assess whether repair or replacement is appropriate.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "Where can I report a suspicious email?",
+    "answer": "Use Outlook's Report button to mark the message as phishing, and forward the suspicious email to it-support@shopunow.com. Do not click links or download attachments from the suspicious message.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "How do I request temporary software access?",
+    "answer": "Submit a Software License Request through the IT Service Desk and specify that temporary access is required. Include the software name, requested duration, and business justification. IT will review the request and provide access if approved.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+  {
+    "question": "How do I secure my ShopUNow laptop when I leave my desk?",
+    "answer": "Configure your laptop to lock automatically after 15 minutes of inactivity and enable sign-in after the computer wakes. You should also manually lock the device whenever you leave your workstation unattended.",
+    "department": "IT Support",
+    "audience": "Internal"
+  },
+
+  {
+    "question": "How do I view my recent invoices on ShopUNow?",
+    "answer": "Log in to your ShopUNow account, go to the \"Orders\" tab, and click on the \"Invoices\" sub-section. You can view invoice dates, amounts, and status and download invoices as PDF files.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "What payment methods does ShopUNow accept for my subscription?",
+    "answer": "ShopUNow accepts major credit cards including Visa, MasterCard, and American Express, debit cards, PayPal, and Apple Pay. Corporate accounts can also use ACH transfers and wire payments.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "I was charged twice for the same order. How can I get a refund?",
+    "answer": "Check your order history to confirm the duplicate charge. If it is a duplicate, contact support through the chat widget or support@shopunow.com. Provide the order ID, transaction ID, and a screenshot. Refunds are normally issued within 3–5 business days.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "Can I set up automatic recurring payments for my monthly subscription?",
+    "answer": "Yes. Open Billing Settings and enable the Auto-Renew option for your subscription. You can turn off auto-renew at any time to stop renewal at the end of the current billing cycle.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "What is the refund policy for digital products purchased on ShopUNow?",
+    "answer": "Digital products are non-refundable once downloaded. If a product is defective or not as described, you can request a refund within 7 days by contacting support with your order ID and explanation.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "How do I update my billing address?",
+    "answer": "Navigate to Account Settings > Billing Address, enter the new address, and select Save Changes. The updated address applies to future invoices and shipping labels.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "I received a partial refund that doesn't match the original amount. What should I do?",
+    "answer": "Check the refund email for the transaction ID. Differences may result from a promotional discount or partial return. Contact support with the order ID and refund ID so the discrepancy can be reviewed.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "Can I pay my invoice in installments?",
+    "answer": "ShopUNow offers a 3-month installment plan for invoices over $200. Open the invoice page, select Pay in Installments, and follow the prompts to enroll.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "What should I do if my credit card was declined during checkout?",
+    "answer": "Verify that your card has sufficient funds and that the billing address matches the address on file. If the problem persists, try another card or PayPal. You can also contact your bank or ShopUNow support.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "How can I export my purchase history for tax purposes?",
+    "answer": "In the Orders section, select Export History. Choose your date range and CSV or PDF format. The exported file includes order IDs, dates, amounts, and tax details.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "Is there a discount for paying annually instead of monthly?",
+    "answer": "Yes. Paying annually saves 15% compared with the monthly rate. Go to Billing Settings, select the annual plan, and confirm the payment. The discount applies to the next billing cycle.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "How do I dispute a charge that I don't recognize?",
+    "answer": "First check your order history. If the charge remains unexplained, open a dispute through the chat widget or email support@shopunow.com with the transaction ID and a description. ShopUNow will investigate with the payment processor.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+
+  {
+    "question": "How can I request a refund for an eligible purchase?",
+    "answer": "Contact ShopUNow support through the chat widget or support@shopunow.com and provide your order ID along with the reason for the refund. Support will review the request according to the applicable refund policy.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "Where can I change the credit card used for my subscription?",
+    "answer": "Open your ShopUNow account and navigate to Billing Settings. From there you can add or change the payment method used for your subscription.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "How long does a duplicate-charge refund take?",
+    "answer": "After ShopUNow confirms that a charge is a duplicate, the refund is normally issued within 3–5 business days. Provide the order ID and transaction ID when contacting support.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "Can I use PayPal to pay for my ShopUNow subscription?",
+    "answer": "Yes. PayPal is one of the accepted payment methods for ShopUNow subscriptions. You can select PayPal when choosing or updating your payment method in Billing Settings.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "How can I download a copy of my invoice?",
+    "answer": "Log in to your ShopUNow account, open Orders, and select the Invoices subsection. Choose the invoice you need and download it as a PDF.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "What should I do if the amount refunded to me is incorrect?",
+    "answer": "Review the refund email and identify the transaction and refund IDs. Then contact ShopUNow support with your order ID and refund information so the discrepancy can be investigated.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "How do I turn off automatic subscription renewal?",
+    "answer": "Go to Billing Settings and turn off the Auto-Renew option. Your subscription will remain active until the end of the current billing cycle.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+  {
+    "question": "What information should I provide when reporting an unfamiliar charge?",
+    "answer": "Provide the transaction ID, a description of the unfamiliar charge, and any relevant order information. You can submit the dispute through the ShopUNow chat widget or by emailing support@shopunow.com.",
+    "department": "Billing & Payments",
+    "audience": "External"
+  },
+
+  {
+    "question": "What shipping options does ShopUNow offer for my order?",
+    "answer": "ShopUNow offers Standard shipping, which takes 5–7 business days, Express shipping, which takes 2–3 business days, and Same-Day delivery within the specified service area. Standard shipping is free for orders over $75.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "How can I track my shipment once it has shipped?",
+    "answer": "After your order ships, you will receive a confirmation email containing a tracking number and carrier link. You can also log in to ShopUNow, open My Orders, and select Track Package.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "What happens if I'm not home when my package arrives?",
+    "answer": "If you are unavailable, the carrier will leave a delivery notice with instructions for redelivery or pickup. For Same-Day deliveries, contact support within 24 hours if you need assistance with the delivery window.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "Can I change my shipping address after placing an order?",
+    "answer": "You can change your shipping address within 2 hours of placing an order through the order details page. After that period, contact customer support as soon as possible to determine whether the address can still be changed before shipment.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "What is ShopUNow's return policy for items that arrive damaged?",
+    "answer": "Take photos of the damaged item and packaging and contact support within 48 hours of delivery. ShopUNow will provide a prepaid return label and arrange a replacement or refund. The return shipping cost is covered for damaged items.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "Do you ship internationally?",
+    "answer": "Yes. ShopUNow ships to Canada, Mexico, and the United Kingdom. International orders are generally processed with DHL Express and typically arrive within 7–10 business days. Customs duties are the responsibility of the recipient.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "What should I do if my package is delayed?",
+    "answer": "Check the tracking information first. If the status shows Delayed or Out for Delivery but has not changed for 24 hours, contact ShopUNow support with your order number. Support will investigate with the carrier and provide an updated ETA.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "Can I choose a pickup location instead of home delivery?",
+    "answer": "Yes. During checkout, select the Pickup option and choose your preferred ShopUNow retail location. You will receive a pickup confirmation email when the order is ready.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "What is the estimated delivery time for a Standard shipment to Denver?",
+    "answer": "Standard shipping to Denver is estimated at 5–7 business days from the date the order ships. Tracking becomes available once the package leaves the ShopUNow warehouse.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "How do I cancel a shipment that hasn't shipped yet?",
+    "answer": "Log into your ShopUNow account, open My Orders, and select Cancel Order. If the order is still processing, it can be cancelled and a full refund will be issued. If it has shipped, follow the return process after delivery.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "Do you offer free shipping for first-time customers?",
+    "answer": "Yes. First-time customers receive free Standard shipping on orders over $50. Orders below $50 have a flat $5.99 Standard shipping fee. Express and Same-Day shipping are excluded from this promotion.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "What happens if I miss the delivery window for Same-Day shipping?",
+    "answer": "If you miss the Same-Day delivery window, the carrier will leave a notice and attempt another delivery within the next 24 hours. You can also contact support to request a reschedule or pickup option.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+
+  {
+    "question": "How do I find my tracking number?",
+    "answer": "After your order ships, ShopUNow sends a confirmation email containing your tracking number and the carrier's website link. You can also find the tracking number by opening My Orders and selecting Track Package.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "Where can I see the current status of my delivery?",
+    "answer": "Log into your ShopUNow account, open My Orders, and select Track Package for the relevant order. The tracking information shows the current delivery status and available carrier updates.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "Can someone else receive my ShopUNow package?",
+    "answer": "You can authorize a trusted neighbor to receive a package by adding their name in the delivery instructions during checkout. Availability may depend on the carrier and delivery method.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "How long do I have to report a damaged delivery?",
+    "answer": "Contact ShopUNow support within 48 hours of delivery if an item arrives damaged. Include photos of the item and packaging so the support team can arrange a replacement or refund.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "What countries can ShopUNow deliver to internationally?",
+    "answer": "ShopUNow currently ships internationally to Canada, Mexico, and the United Kingdom. International shipping fees depend on destination and package weight.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "How quickly can I receive an Express shipment?",
+    "answer": "Express shipping typically takes 2–3 business days. The available shipping methods and final delivery estimate are displayed during checkout.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "Can I pick up my order from a ShopUNow store?",
+    "answer": "Yes. Select the Pickup option during checkout and choose your preferred ShopUNow retail location. The order is normally ready for collection within 24 hours of order confirmation.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  },
+  {
+    "question": "Can I cancel my order before it is shipped?",
+    "answer": "Yes. Open My Orders in your ShopUNow account and select Cancel Order while the order is still processing. A full refund will be issued for an eligible cancellation.",
+    "department": "Shipping & Delivery",
+    "audience": "External"
+  }
 ]
