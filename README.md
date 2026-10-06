@@ -66,7 +66,7 @@ Edit the `.env` file to include your API key:
 ```env
 GROQ_API_KEY=your_groq_api_key_here
 TOP_K=3
-RELEVANCE_THRESHOLD=0.5
+RELEVANCE_THRESHOLD=0.45
 ENABLE_REFLECTION=False
 ```
 
@@ -77,7 +77,7 @@ Generate the synthetic QA dataset:
 ```bash
 python data_generation.py
 ```
-*(This will create a JSON file in the `data/` directory with 12 QA pairs per department).*
+*(This will create a JSON file in the `data/` directory with 20 QA pairs per department).*
 
 Initialize and populate the local ChromaDB vector database:
 ```bash
@@ -91,11 +91,11 @@ The project uses a synthetic retail support dataset containing 48 QA records:
 
 | Department | QA Records |
 |---|---:|
-| HR | 12 |
-| IT Support | 12 |
-| Billing & Payments | 12 |
-| Shipping & Delivery | 12 |
-| **Total** | **48** |
+| HR | 20 |
+| IT Support | 20 |
+| Billing & Payments | 20 |
+| Shipping & Delivery | 20 |
+| **Total** | **80** |
 
 Each record includes department and audience metadata, enabling department-aware retrieval and preventing cross-department knowledge leakage.
 
