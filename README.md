@@ -66,7 +66,7 @@ Edit the `.env` file to include your API key:
 ```env
 GROQ_API_KEY=your_groq_api_key_here
 TOP_K=3
-RELEVANCE_THRESHOLD=0.45
+RELEVANCE_THRESHOLD=0.35
 ENABLE_REFLECTION=False
 ```
 
