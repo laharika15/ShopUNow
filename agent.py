@@ -17,13 +17,21 @@ from retrieval import (
     ABSTENTION_MESSAGE
 )
 
+from memory import conversation_memory
+
 # GRAPH STATE
 
 class GraphState(TypedDict, total=False):
     query: str
+
+    # Stretch Goal 1: conversational memory
+    conversation_history: list[dict]
+    standalone_query: str
+
     sentiment: str
     department: str
     scope: str
+
     context: str
     response: str
     reflection_feedback: str
@@ -48,6 +56,29 @@ def get_rag_llm():
         temperature=0.1
     )
 
+# CONVERSATION HISTORY
+
+def format_conversation_history(history: list[dict]) -> str:
+    """
+    Convert stored conversation turns into a compact text block
+    for the routing and generation prompts.
+    """
+
+    if not history:
+        return "No previous conversation."
+
+    recent_history = history[-5:]
+
+    lines = []
+
+    for turn in recent_history:
+        lines.append(
+            f"User: {turn['user']}\n"
+            f"Assistant: {turn['assistant']}"
+        )
+
+    return "\n\n".join(lines)
+
 # QUERY CLASSIFICATION
 
 def categorize_query(state: GraphState) -> GraphState:
@@ -58,21 +89,45 @@ def categorize_query(state: GraphState) -> GraphState:
         }
     )
 
+    history = format_conversation_history(
+        state.get("conversation_history", [])
+    )
+
     prompt = f"""
 You are the intelligent routing assistant for ShopUNow.
 
-Analyze the user's query based on its meaning,
-context, and intent.
+Analyze the user's CURRENT query using the previous
+conversation when necessary.
 
-USER QUERY:
+PREVIOUS CONVERSATION:
+{history}
+
+CURRENT USER QUERY:
 "{state['query']}"
+
+Your job is to understand the user's current intent.
+
+If the current query is a follow-up such as:
+
+- "What about sick leave?"
+- "How long does that take?"
+- "Can I do that online?"
+- "What if it doesn't work?"
+
+use the previous conversation to understand what
+"that", "it", or the topic refers to.
+
+You must also create a standalone version of the
+current query that can be used for knowledge-base
+retrieval.
 
 Return ONLY valid JSON using exactly this structure:
 
 {{
     "sentiment": "Neutral",
     "department": "Unknown",
-    "scope": "Out-of-Scope"
+    "scope": "Out-of-Scope",
+    "standalone_query": "..."
 }}
 
 Allowed values:
@@ -92,6 +147,10 @@ department:
 scope:
 - In-Scope
 - Out-of-Scope
+
+standalone_query:
+Rewrite the current query as a self-contained question.
+Do not change its meaning.
 
 
 SENTIMENT
@@ -129,7 +188,6 @@ Examples:
 
 "I want to speak to a manager."
 => Negative
-
 
 
 DEPARTMENT
@@ -177,6 +235,7 @@ Shipping & Delivery includes:
 - arrival
 - missed delivery
 
+
 SCOPE
 
 In-Scope means the query is related to ShopUNow,
@@ -215,7 +274,6 @@ Examples:
 
 
 IMPORTANT
-
 
 An In-Scope query does NOT guarantee that the
 knowledge base contains an answer.
@@ -256,17 +314,24 @@ Return ONLY valid JSON.
             result.get("scope", "Out-of-Scope")
         )
 
+        standalone_query = str(
+            result.get(
+                "standalone_query",
+                state["query"]
+            )
+        )
+
     except Exception as e:
 
         print(
             f"[ROUTER] Classification error: {e}"
         )
 
-        # Safe fallback:
-        # never escalate simply because classification failed.
+        # Safe fallback
         sentiment = "Neutral"
         department = "Unknown"
         scope = "Out-of-Scope"
+        standalone_query = state["query"]
 
     print(
         f"[ROUTER] "
@@ -275,10 +340,16 @@ Return ONLY valid JSON.
         f"Scope={scope}"
     )
 
+    print(
+        f"[ROUTER] "
+        f"Standalone query={standalone_query}"
+    )
+
     return {
         "sentiment": sentiment,
         "department": department,
-        "scope": scope
+        "scope": scope,
+        "standalone_query": standalone_query
     }
 
 # HUMAN ESCALATION
@@ -317,18 +388,23 @@ def out_of_scope_response(state: GraphState) -> GraphState:
 
 def rag_generation(state: GraphState) -> GraphState:
 
+    search_query = state.get(
+        "standalone_query",
+        state["query"]
+    )
+
     print(
         f"[RAG] Searching knowledge base for: "
-        f"{state['query']}"
+        f"{search_query}"
     )
 
     context = retrieve_context(
-        state["query"],
+        search_query,
         state["department"]
     )
 
     # NO SUFFICIENT KB INFORMATION
-    #
+
     # IMPORTANT:
     # This is NOT human escalation.
 
@@ -354,11 +430,21 @@ def rag_generation(state: GraphState) -> GraphState:
 
     llm = get_rag_llm()
 
+    history = format_conversation_history(
+        state.get("conversation_history", [])
+    )
+
     system_prompt = f"""
 You are the ShopUNow AI assistant.
 
-USER QUESTION:
+CONVERSATION HISTORY:
+{history}
+
+CURRENT USER QUESTION:
 {state["query"]}
+
+STANDALONE QUESTION:
+{search_query}
 
 DEPARTMENT:
 {state["department"]}
@@ -411,6 +497,12 @@ knowledge base to answer this accurately.
 
 10. Answer the user's actual question rather than
     discussing how the system works.
+
+11. Use the conversation history only to understand
+    references and follow-up questions. Do not use
+    previous assistant responses as factual knowledge
+    when they conflict with the retrieved ShopUNow
+    knowledge.
 """
 
     messages = [
@@ -440,7 +532,7 @@ knowledge base to answer this accurately.
         }
 
     # GROQ ITSELF DETERMINED THAT KB IS INSUFFICIENT
-
+    
     if response_text == ABSTENTION_MESSAGE:
 
         print(
@@ -465,6 +557,7 @@ knowledge base to answer this accurately.
 def reflection_node(state: GraphState) -> GraphState:
 
     if not state.get("context"):
+
         return {
             "reflection_feedback": "Skipped - no context"
         }
@@ -548,17 +641,17 @@ def route_query(state: GraphState) -> str:
     )
 
     # 1. OUT-OF-SCOPE
-    #
+
     # Never escalate simply because the question
     # is unrelated to ShopUNow.
-   
+
     if scope == "out-of-scope":
         return "out_of_scope"
 
     # 2. GENUINE NEGATIVE IN-SCOPE QUERY
-    #
+
     # Only now can sentiment trigger escalation.
-   
+
     if (
         scope == "in-scope"
         and sentiment == "negative"
@@ -566,15 +659,14 @@ def route_query(state: GraphState) -> str:
         return "escalate"
 
     # 3. UNKNOWN DEPARTMENT
-    #
+
     # Do NOT send to human.
     # The query cannot safely be routed to a
     # department, so handle it as unsupported scope.
-   
+
     if department == "Unknown":
         return "out_of_scope"
 
-    
     # 4. NORMAL SHOPUNOW QUERY
 
     return "rag"
@@ -584,6 +676,7 @@ def route_query(state: GraphState) -> str:
 def after_rag(state: GraphState) -> str:
 
     # Retrieval failure is NOT human escalation.
+
     if state.get("needs_escalation", False):
         return "end"
 
@@ -669,5 +762,42 @@ workflow.add_edge(
 )
 
 # COMPILE
-
 graph_app = workflow.compile()
+
+# CONVERSATIONAL AGENT WRAPPER
+
+def run_agent(
+    query: str,
+    session_id: str = "default"
+) -> dict:
+    """
+    Run the ShopUNow agent using session-specific
+    conversational memory.
+
+    Each session_id gets its own conversation history,
+    allowing multiple users to interact independently.
+    """
+
+    history = conversation_memory.get_history(
+        session_id
+    )
+
+    state = {
+        "query": query,
+        "conversation_history": history
+    }
+
+    result = graph_app.invoke(state)
+
+    response = result.get(
+        "response",
+        "I'm sorry, but I was unable to process your request right now."
+    )
+
+    conversation_memory.add_turn(
+        session_id,
+        query,
+        response
+    )
+
+    return result
