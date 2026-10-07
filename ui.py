@@ -1,6 +1,6 @@
 import streamlit as st
 from database import initialize_database
-from agent import graph_app
+from agent import run_agent
 
 initialize_database()
 
@@ -52,6 +52,11 @@ st.divider()
 # -----------------------------
 # Session state
 # -----------------------------
+import uuid
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(
+        uuid.uuid4()
+    )
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "escalation_pending" not in st.session_state:
@@ -69,8 +74,15 @@ with st.sidebar:
     st.header("💡 Try an Example")
 
     if st.button("🗑️ Clear Chat", use_container_width=True):
-        st.session_state.messages = []
-        st.rerun()
+    from memory import conversation_memory
+
+    st.session_state.messages = []
+
+    conversation_memory.clear(
+        st.session_state.session_id
+    )
+
+    st.rerun()
 
     example_questions = [
         "How do I reset my ShopUNow employee VPN password?",
@@ -148,9 +160,10 @@ if query:
             with st.spinner(
                 "🤖 ShopUNow AI is analyzing your question..."
             ):
-                result = graph_app.invoke({
-                    "query": query
-                })
+               result = run_agent(
+                    query=query,
+                    session_id=st.session_state.session_id,
+                )
 
             st.write(result["response"])
 
