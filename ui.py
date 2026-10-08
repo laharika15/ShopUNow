@@ -236,7 +236,7 @@ for message in st.session_state.messages:
         # Display meta metrics beneath bot responses if present
         if message["role"] == "assistant" and "metadata" in message:
             meta = message["metadata"]
-            meta_cols = st.columns([1, 1, 1, 4])
+            meta_cols = st.columns(3)
             meta_cols[0].caption(f"📁 **Dept:** {meta.get('department', 'N/A')}")
             meta_cols[1].caption(f"🎭 **Sentiment:** {meta.get('sentiment', 'N/A')}")
             meta_cols[2].caption(f"🎯 **Scope:** {meta.get('scope', 'In-Scope')}")
@@ -265,41 +265,43 @@ if final_prompt:
             department_meta = "Unknown"
             sentiment_meta = "Neutral"
             scope_meta = "In-Scope"
+            clean_output = ""
             
             try:
                 # 1. Capture raw workspace backend output
                 raw_response = run_agent(final_prompt, st.session_state.session_id)
                 
-                # 2. Extract cleanly targeted human response & metrics from metadata wrapper
-                try:
-                    if isinstance(raw_response, dict):
-                        response_data = raw_response
-                    else:
-                        response_data = json.loads(raw_response)
-                        
-                    clean_output = response_data.get("response", "Could not fetch message contents.")
-                    department_meta = response_data.get("department", "General")
-sentiment_meta = response_data.get("sentiment", "Neutral")
-scope_meta = response_data.get("scope", "In-Scope")
-except (json.JSONDecodeError, TypeError):
-clean_output = str(raw_response)
-except Exception:
-clean_output = "I encountered an issue processing your request. Please try your message again."
-# 3. Output beautiful real-time text stream to user interface view
-st.write_stream(text_streamer(clean_output))
-# 4. Render immediate metadata logging pills beneath the stream
-live_cols = st.columns([1, 1, 1, 4])
-live_cols[0].caption(f"📁 Dept: {department_meta}")
-live_cols[1].caption(f"🎭 Sentiment: {sentiment_meta}")
-live_cols[2].caption(f"🎯 Scope: {scope_meta}")
-# Cache everything into state memory thread pool
-st.session_state.messages.append({
-"role": "assistant",
-"content": clean_output,
-"metadata": {
-"department": department_meta,
-"sentiment": sentiment_meta,
-"scope": scope_meta
-}
-})
-st.rerun()
+                # 2. Parse response format wrapper safely
+                if isinstance(raw_response, dict):
+                    response_data = raw_response
+                else:
+                    response_data = json.loads(raw_response)
+                    
+                clean_output = response_data.get("response", "Could not fetch message contents.")
+                department_meta = response_data.get("department", "General")
+                sentiment_meta = response_data.get("sentiment", "Neutral")
+                scope_meta = response_data.get("scope", "In-Scope")
+                except (json.JSONDecodeError, TypeError):
+                # Fallback if raw_response is already a clean plain text string
+                clean_output = str(raw_response)
+                except Exception:
+                # Absolute safety fallback line
+                clean_output = "I encountered an issue processing your request. Please try your message again."
+                # 3. Output beautiful real-time text stream to user interface view
+                st.write_stream(text_streamer(clean_output))
+                # 4. INTEGRATED METADATA COLUMNS LOGIC FIXED BY YOU
+                live_cols = st.columns(3)
+                live_cols[0].caption(f"📁 Dept: {department_meta}")
+                live_cols[1].caption(f"🎭 Sentiment: {sentiment_meta}")
+                live_cols[2].caption(f"🎯 Scope: {scope_meta}")
+                # Cache everything into state memory thread pool
+                st.session_state.messages.append({
+                "role": "assistant",
+                "content": clean_output,
+                "metadata": {
+                "department": department_meta,
+                "sentiment": sentiment_meta,
+                "scope": scope_meta
+                }
+                })
+                st.rerun()
