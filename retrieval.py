@@ -94,6 +94,46 @@ SYNONYM_MAP = {
         "login",
         "account access"
     ],
+    laptop": [
+        "computer",
+        "pc",
+        "device",
+        "work computer",
+        "work laptop",
+    ],
+    "computer": [
+        "laptop",
+        "pc",
+        "device",
+        "work computer",
+        "work laptop",
+    ],
+    "pc": [
+        "computer",
+        "laptop",
+        "device",
+    ],
+    "device": [
+        "computer",
+        "laptop",
+        "pc",
+    ],
+    "slow": [
+        "running slowly",
+        "performance issue",
+        "poor performance",
+        "sluggish",
+    ],
+    "password": [
+        "login",
+        "credentials",
+        "sign-in",
+    ],
+    "vpn": [
+        "virtual private network",
+        "remote access",
+        "remote connection",
+    ],
 
     # Billing & Payments
     "refund": [
