@@ -39,6 +39,18 @@ if "active_prompt" not in st.session_state:
 
 
 # ============================================================
+# AVATAR DEFINITIONS
+# ============================================================
+USER_AVATAR = "👤"
+
+try:
+    with open("assets/shopunow_logo.png", "rb") as f:
+        BOT_AVATAR = "assets/shopunow_logo.png"
+except FileNotFoundError:
+    BOT_AVATAR = "🛍️"
+
+
+# ============================================================
 # GLOBAL UI STYLING
 # ============================================================
 st.markdown(
@@ -46,7 +58,7 @@ st.markdown(
     <style>
 
     /* ========================================================
-       GLOBAL APP
+       GLOBAL APP BACKGROUND
        ======================================================== */
 
     .stApp {
@@ -55,7 +67,7 @@ st.markdown(
 
 
     /* ========================================================
-       MAIN CONTENT WIDTH
+       MAIN CONTENT
        ======================================================== */
 
     .main .block-container {
@@ -66,7 +78,7 @@ st.markdown(
 
 
     /* ========================================================
-       SIDEBAR BACKGROUND
+       SIDEBAR
        ======================================================== */
 
     [data-testid="stSidebar"] {
@@ -133,18 +145,6 @@ st.markdown(
 
 
 # ============================================================
-# AVATAR DEFINITIONS
-# ============================================================
-USER_AVATAR = "👤"
-
-try:
-    with open("assets/shopunow_logo.png", "rb") as f:
-        BOT_AVATAR = "assets/shopunow_logo.png"
-except FileNotFoundError:
-    BOT_AVATAR = "🛍️"
-
-
-# ============================================================
 # HELPER FUNCTION
 # ============================================================
 def text_streamer(text_block: str):
@@ -161,12 +161,12 @@ def text_streamer(text_block: str):
 
 
 # ============================================================
-# SIDEBAR
+# SIDEBAR NAVIGATION & QUICK ACTIONS
 # ============================================================
 with st.sidebar:
 
     # --------------------------------------------------------
-    # LOGO
+    # SHOPUNOW LOGO
     # --------------------------------------------------------
     try:
         st.image(
@@ -182,9 +182,9 @@ with st.sidebar:
     st.write("---")
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # QUICK ACTIONS
-    # --------------------------------------------------------
+    # ========================================================
     st.subheader("QUICK ACTIONS")
 
 
@@ -202,9 +202,9 @@ with st.sidebar:
     st.write("---")
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # EXAMPLE QUESTIONS
-    # --------------------------------------------------------
+    # ========================================================
     st.subheader("EXAMPLE QUESTIONS")
 
 
@@ -259,9 +259,9 @@ with st.sidebar:
     st.write("---")
 
 
-    # --------------------------------------------------------
+    # ========================================================
     # DEPARTMENTS
-    # --------------------------------------------------------
+    # ========================================================
     st.subheader("DEPARTMENTS")
 
 
@@ -320,68 +320,27 @@ with st.sidebar:
 # ------------------------------------------------------------
 # WELCOME HEADER
 # ------------------------------------------------------------
-# This appears only when there is no conversation.
+# Uses native Streamlit components.
+# No custom HTML is used here.
+# The header disappears after the first message.
 # ------------------------------------------------------------
 if not st.session_state.messages:
 
     st.markdown(
-        """
-        <div style="
-            background-color: #FFFFFF;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            margin-bottom: 16px;
-        ">
+        "## 🛍️ ShopUNow AI Assistant"
+    )
 
-            <div style="
-                font-size: 24px;
-                font-weight: 700;
-                color: #1E293B;
-                line-height: 1.3;
-            ">
-                ShopUNow AI Assistant
-            </div>
+    st.markdown(
+        "**Intelligent retail support**"
+    )
 
-            <div style="
-                font-size: 14px;
-                color: #64748B;
-                margin-top: 4px;
-            ">
-                Intelligent retail support
-            </div>
-
-            <div style="
-                font-size: 13px;
-                color: #10B981;
-                font-weight: 600;
-                margin-top: 10px;
-            ">
-                ● AI Assistant Online
-            </div>
-
-            <div style="
-                font-size: 12px;
-                color: #059669;
-                font-weight: 700;
-                letter-spacing: 0.05em;
-                background-color: #D1FAE5;
-                padding: 4px 8px;
-                border-radius: 4px;
-                display: inline-block;
-                margin-top: 10px;
-            ">
-                ● READY TO HELP
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
+    st.success(
+        "🟢 AI Assistant Online • READY TO HELP"
     )
 
 
 # ============================================================
-# HISTORICAL CHAT LOG
+# RENDER HISTORICAL CHAT LOG
 # ============================================================
 for message in st.session_state.messages:
 
@@ -397,7 +356,12 @@ for message in st.session_state.messages:
         avatar=current_avatar,
     ):
 
-        st.write(message["content"])
+        # ----------------------------------------------------
+        # MESSAGE CONTENT
+        # ----------------------------------------------------
+        st.write(
+            message["content"]
+        )
 
 
         # ----------------------------------------------------
@@ -445,14 +409,16 @@ final_prompt = None
 # DETERMINE FINAL PROMPT
 # ============================================================
 
+# Sidebar button prompt
 if st.session_state.active_prompt:
 
     final_prompt = st.session_state.active_prompt
 
-    # Consume sidebar prompt.
+    # Consume prompt so it runs only once.
     st.session_state.active_prompt = None
 
 
+# Normal chat input
 elif user_input:
 
     final_prompt = user_input
@@ -471,7 +437,9 @@ if final_prompt:
         avatar=USER_AVATAR,
     ):
 
-        st.write(final_prompt)
+        st.write(
+            final_prompt
+        )
 
 
     # --------------------------------------------------------
@@ -493,14 +461,17 @@ if final_prompt:
         avatar=BOT_AVATAR,
     ):
 
-        with st.spinner("Processing request..."):
+        with st.spinner(
+            "Processing request..."
+        ):
 
             # ------------------------------------------------
-            # DEFAULT VALUES
+            # DEFAULT METADATA
             # ------------------------------------------------
             department_meta = "General"
             sentiment_meta = "Neutral"
             scope_meta = "In-Scope"
+
             clean_output = ""
 
 
@@ -516,9 +487,12 @@ if final_prompt:
 
 
                 # =================================================
-                # PARSE AGENT RESPONSE
+                # PARSE RESPONSE
                 # =================================================
-                if isinstance(raw_response, dict):
+                if isinstance(
+                    raw_response,
+                    dict,
+                ):
 
                     response_data = raw_response
 
@@ -564,7 +538,9 @@ if final_prompt:
                 TypeError,
             ):
 
-                clean_output = str(raw_response)
+                clean_output = str(
+                    raw_response
+                )
 
 
             # =================================================
@@ -579,7 +555,7 @@ if final_prompt:
 
 
             # =================================================
-            # ENSURE VALID OUTPUT
+            # ENSURE OUTPUT IS VALID
             # =================================================
             if clean_output is None:
 
@@ -588,14 +564,18 @@ if final_prompt:
                 )
 
 
-            clean_output = str(clean_output)
+            clean_output = str(
+                clean_output
+            )
 
 
             # =================================================
             # STREAM RESPONSE
             # =================================================
             st.write_stream(
-                text_streamer(clean_output)
+                text_streamer(
+                    clean_output
+                )
             )
 
 
