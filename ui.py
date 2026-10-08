@@ -47,37 +47,47 @@ st.markdown(
         background-color: #0B2545 !important;
     }
     
-    /* Target only text paragraphs, titles, and captions to be white */
+    /* Target only text labels to be white */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
     [data-testid="stSidebar"] p, 
     [data-testid="stSidebar"] caption,
-    [data-testid="stSidebar"] div {
-        color: #FFFFFF;
+    [data-testid="stSidebar"] .stMarkdown p {
+        color: #FFFFFF !important;
     }
     
-    /* FIX FOR SIDEBAR BUTTON TEXT INVISIBILITY */
+    /* FIX FOR SIDEBAR BUTTON TRANSPARENCY & VISIBILITY */
     [data-testid="stSidebar"] .stButton button {
         background-color: rgba(255, 255, 255, 0.08) !important;
         color: #FFFFFF !important;
         border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease-in-out;
     }
     
-    /* Hover state for sidebar buttons */
+    /* Force internal nested paragraphs inside buttons to stay white */
+    [data-testid="stSidebar"] .stButton button p {
+        color: #FFFFFF !important;
+    }
+    
+    /* Hover state for buttons */
     [data-testid="stSidebar"] .stButton button:hover {
-        background-color: rgba(255, 255, 255, 0.16) !important;
+        background-color: rgba(255, 255, 255, 0.18) !important;
         color: #FFFFFF !important;
         border: 1px solid #10B981 !important;
     }
+    [data-testid="stSidebar"] .stButton button:hover p {
+        color: #FFFFFF !important;
+    }
 
-    /* Main Layout Framework */
+    /* Main Content Container Framework */
     .main .block-container {
         max-width: 1000px;
         padding-top: 2rem;
     }
 
-    /* Custom Header Badges & Typography */
+    /* Custom Main Panel Header Cards */
     .header-container {
         background-color: #FFFFFF;
         padding: 1.5rem;
@@ -120,13 +130,16 @@ st.markdown(
 # SIDEBAR NAVIGATION & QUICK ACTIONS
 # ============================================================
 with st.sidebar:
-    # Try loading your logo file
+    # EXACT LOGO ASSET IMPLEMENTATION
     try:
-        st.image("shopunow_logo.png", use_container_width=True)
+        st.image(
+            "assets/shopunow_logo.png",
+            width=210,
+        )
     except Exception:
-        # Fallback text if file path is unreachable
+        # Graceful absolute fallback text if assets directory tracking desyncs
         st.title("🛍️ ShopUNow")
-        st.caption("⚠️ 'shopunow_logo.png' not found in project directory folder.")
+        st.caption("AI-powered support assistant")
         
     st.write("---")
     
@@ -156,7 +169,6 @@ with st.sidebar:
         st.rerun()
 
     st.write("---")
-    
     st.subheader("DEPARTMENTS")
     
     if st.button("👥 HR Department", use_container_width=True):
