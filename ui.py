@@ -42,14 +42,35 @@ st.markdown(
         background-color: #F4F6F9;
     }
     
-    /* Elegant Sidebar Customization */
+    /* Elegant Sidebar Background */
     [data-testid="stSidebar"] {
         background-color: #0B2545 !important;
     }
-    [data-testid="stSidebar"] *, [data-testid="stSidebar"] p {
-        color: #FFFFFF !important;
+    
+    /* Target only text paragraphs, titles, and captions to be white */
+    [data-testid="stSidebar"] h1, 
+    [data-testid="stSidebar"] h2, 
+    [data-testid="stSidebar"] h3, 
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] caption,
+    [data-testid="stSidebar"] div {
+        color: #FFFFFF;
     }
     
+    /* FIX FOR SIDEBAR BUTTON TEXT INVISIBILITY */
+    [data-testid="stSidebar"] .stButton button {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: #FFFFFF !important;
+        border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    }
+    
+    /* Hover state for sidebar buttons */
+    [data-testid="stSidebar"] .stButton button:hover {
+        background-color: rgba(255, 255, 255, 0.16) !important;
+        color: #FFFFFF !important;
+        border: 1px solid #10B981 !important;
+    }
+
     /* Main Layout Framework */
     .main .block-container {
         max-width: 1000px;
@@ -67,21 +88,21 @@ st.markdown(
     .top-header-title {
         font-size: 24px;
         font-weight: 700;
-        color: #1E293B;
+        color: #1E293B !important;
     }
     .top-header-subtitle {
         font-size: 14px;
-        color: #64748B;
+        color: #64748B !important;
     }
     .online-status {
         font-size: 13px;
-        color: #10B981;
+        color: #10B981 !important;
         font-weight: 600;
         margin-top: 0.5rem;
     }
     .welcome-status {
         font-size: 12px;
-        color: #059669;
+        color: #059669 !important;
         font-weight: 700;
         letter-spacing: 0.05em;
         background-color: #D1FAE5;
@@ -99,13 +120,13 @@ st.markdown(
 # SIDEBAR NAVIGATION & QUICK ACTIONS
 # ============================================================
 with st.sidebar:
-    # 1. UPDATED IMAGE LOGO PATH
+    # Try loading your logo file
     try:
         st.image("shopunow_logo.png", use_container_width=True)
     except Exception:
-        # Safe fallback text if the file isn't in your root directory yet
+        # Fallback text if file path is unreachable
         st.title("🛍️ ShopUNow")
-        st.caption("AI-powered support assistant")
+        st.caption("⚠️ 'shopunow_logo.png' not found in project directory folder.")
         
     st.write("---")
     
@@ -118,41 +139,39 @@ with st.sidebar:
     st.write("---")
     st.subheader("EXAMPLE QUESTIONS")
     
-    if st.button("How do I reset my ShopUNow employee VPN password?", use_container_width=True, type="secondary"):
+    if st.button("How do I reset my ShopUNow employee VPN password?", use_container_width=True):
         st.session_state.active_prompt = "How do I reset my ShopUNow employee VPN password?"
         st.rerun()
         
-    if st.button("How do I apply for a vacation day?", use_container_width=True, type="secondary"):
+    if st.button("How do I apply for a vacation day?", use_container_width=True):
         st.session_state.active_prompt = "How do I apply for a vacation day?"
         st.rerun()
         
-    if st.button("What should I do if my laptop is running slow?", use_container_width=True, type="secondary"):
+    if st.button("What should I do if my laptop is running slow?", use_container_width=True):
         st.session_state.active_prompt = "What should I do if my laptop is running slow?"
         st.rerun()
         
-    if st.button("I am extremely frustrated because my VPN has been broken for days!", use_container_width=True, type="secondary"):
+    if st.button("I am extremely frustrated because my VPN has been broken for days!", use_container_width=True):
         st.session_state.active_prompt = "I am extremely frustrated because my VPN has been broken for days!"
         st.rerun()
 
     st.write("---")
     
-    # 2. INTERACTIVE DEPARTMENTS SECTION
     st.subheader("DEPARTMENTS")
-    st.caption("Click a department to target your inquiry context")
     
-    if st.button("👥 HR Department", use_container_width=True, type="secondary"):
+    if st.button("👥 HR Department", use_container_width=True):
         st.session_state.active_prompt = "I need assistance from the HR department regarding company policy."
         st.rerun()
         
-    if st.button("💻 IT Support", use_container_width=True, type="secondary"):
+    if st.button("💻 IT Support", use_container_width=True):
         st.session_state.active_prompt = "I need to open an IT technical support request."
         st.rerun()
         
-    if st.button("💳 Billing & Payments", use_container_width=True, type="secondary"):
+    if st.button("💳 Billing & Payments", use_container_width=True):
         st.session_state.active_prompt = "I have a question about vendor billing or employee payments."
         st.rerun()
         
-    if st.button("📦 Shipping & Delivery", use_container_width=True, type="secondary"):
+    if st.button("📦 Shipping & Delivery", use_container_width=True):
         st.session_state.active_prompt = "Show me the tracking options or shipping department procedures."
         st.rerun()
 
@@ -160,7 +179,7 @@ with st.sidebar:
 # MAIN INTERFACE RENDERER
 # ============================================================
 
-# 3. CONDITIONAL WELCOME HEADERS (Only show if there is no chat history yet)
+# CONDITIONAL WELCOME HEADERS (Only show if there is no chat history yet)
 if not st.session_state.messages:
     st.markdown(
         """
@@ -191,12 +210,10 @@ elif user_input:
 
 # Process the Message submission
 if final_prompt:
-    # Display user query
     with st.chat_message("user"):
         st.write(final_prompt)
     st.session_state.messages.append({"role": "user", "content": final_prompt})
     
-    # Process through AI pipeline backend
     with st.chat_message("assistant"):
         with st.spinner("Processing request..."):
             try:
