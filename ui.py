@@ -7,10 +7,8 @@ from memory import conversation_memory
 
 
 # ============================================================
-# INITIALIZATION
+# PAGE CONFIGURATION
 # ============================================================
-
-initialize_database()
 
 st.set_page_config(
     page_title="ShopUNow AI Assistant",
@@ -18,6 +16,13 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
 )
+
+
+# ============================================================
+# INITIALIZATION
+# ============================================================
+
+initialize_database()
 
 
 # ============================================================
@@ -41,30 +46,36 @@ if "escalation_confirmation" not in st.session_state:
 
 
 # ============================================================
-# CUSTOM DESIGN
+# PROFESSIONAL DESIGN
 # ============================================================
 
 st.markdown(
     """
     <style>
 
-    /* -------------------------------------------------------
+    /* ======================================================
        GLOBAL
-    ------------------------------------------------------- */
+       ====================================================== */
 
     .stApp {
-        background: #f7f9fc;
+        background: #f6f8fb;
     }
 
     .main .block-container {
-        max-width: 1100px;
-        padding-top: 2rem;
+        max-width: 1180px;
+        padding-top: 1.5rem;
         padding-bottom: 4rem;
     }
 
-    /* -------------------------------------------------------
+    /* Remove excessive Streamlit spacing */
+    [data-testid="stVerticalBlock"] {
+        gap: 0.6rem;
+    }
+
+
+    /* ======================================================
        SIDEBAR
-    ------------------------------------------------------- */
+       ====================================================== */
 
     [data-testid="stSidebar"] {
         background: #0b2a52;
@@ -75,61 +86,112 @@ st.markdown(
         color: white;
     }
 
+    [data-testid="stSidebar"] .stImage {
+        margin-bottom: 5px;
+    }
+
+    .sidebar-tagline {
+        color: #b9c9dc;
+        font-size: 0.82rem;
+        margin-top: -5px;
+        margin-bottom: 25px;
+        line-height: 1.4;
+    }
+
+    .sidebar-heading {
+        color: #ffffff;
+        font-size: 0.86rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        margin-top: 18px;
+        margin-bottom: 10px;
+    }
+
+    .sidebar-item {
+        color: #d7e3f0;
+        font-size: 0.84rem;
+        padding: 5px 0;
+        line-height: 1.35;
+    }
+
+    .sidebar-capability {
+        color: #c9d8e8;
+        font-size: 0.80rem;
+        padding: 4px 0;
+    }
+
+    [data-testid="stSidebar"] hr {
+        border-color: rgba(255,255,255,0.15) !important;
+        margin: 18px 0;
+    }
+
     [data-testid="stSidebar"] .stButton button {
-        background: rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.07);
         color: white;
         border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 10px;
+        border-radius: 9px;
+        font-size: 0.82rem;
         text-align: left;
+        min-height: 42px;
         transition: all 0.2s ease;
     }
 
     [data-testid="stSidebar"] .stButton button:hover {
-        background: rgba(255,255,255,0.16);
+        background: rgba(255,255,255,0.14);
         border-color: #ff9d24;
         color: white;
+        transform: translateY(-1px);
     }
 
-    /* -------------------------------------------------------
-       HEADER
-    ------------------------------------------------------- */
 
-    .brand-header {
-        background: white;
-        border-radius: 18px;
-        padding: 18px 24px;
-        margin-bottom: 20px;
-        border: 1px solid #e4e9f0;
-        box-shadow: 0 4px 18px rgba(11, 42, 82, 0.06);
+    /* ======================================================
+       TOP HEADER
+       ====================================================== */
+
+    .top-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #ffffff;
+        border: 1px solid #e3e8ef;
+        border-radius: 16px;
+        padding: 14px 20px;
+        margin-bottom: 18px;
+        box-shadow: 0 3px 14px rgba(11, 42, 82, 0.045);
     }
 
-    .brand-title {
-        font-size: 2rem;
-        font-weight: 750;
+    .top-header-title {
         color: #0b2a52;
-        margin-bottom: 2px;
+        font-size: 1.22rem;
+        font-weight: 700;
+        margin: 0;
     }
 
-    .brand-subtitle {
+    .top-header-subtitle {
         color: #667085;
-        font-size: 0.95rem;
-        margin-top: 0;
+        font-size: 0.78rem;
+        margin-top: 2px;
     }
 
     .online-status {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         background: #ecfdf3;
         color: #15803d;
-        padding: 6px 12px;
+        border: 1px solid #bbf7d0;
+        padding: 6px 11px;
         border-radius: 20px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        margin-top: 8px;
+        font-size: 0.73rem;
+        font-weight: 650;
+        white-space: nowrap;
     }
 
-    /* -------------------------------------------------------
-       WELCOME CARD
-    ------------------------------------------------------- */
+
+    /* ======================================================
+       WELCOME AREA
+       ====================================================== */
 
     .welcome-card {
         background: linear-gradient(
@@ -139,122 +201,220 @@ st.markdown(
         );
         border: 1px solid #dce6f3;
         border-radius: 20px;
-        padding: 32px;
-        margin: 20px 0 25px 0;
-        box-shadow: 0 6px 24px rgba(11, 42, 82, 0.06);
+        padding: 34px 30px;
+        margin-bottom: 18px;
+        box-shadow: 0 6px 24px rgba(11, 42, 82, 0.055);
+    }
+
+    .welcome-status {
+        color: #15803d;
+        font-size: 0.76rem;
+        font-weight: 650;
+        margin-bottom: 9px;
     }
 
     .welcome-title {
         color: #0b2a52;
-        font-size: 1.65rem;
-        font-weight: 700;
-        margin-bottom: 8px;
+        font-size: 2rem;
+        font-weight: 750;
+        line-height: 1.2;
+        margin-bottom: 10px;
     }
 
     .welcome-text {
         color: #667085;
-        font-size: 1rem;
-        line-height: 1.6;
-    }
-
-    .capability {
-        background: white;
-        border: 1px solid #e5eaf1;
-        border-radius: 12px;
-        padding: 14px;
-        margin-top: 10px;
-        color: #344054;
-        font-size: 0.9rem;
-    }
-
-    /* -------------------------------------------------------
-       CHAT
-    ------------------------------------------------------- */
-
-    [data-testid="stChatMessage"] {
-        border-radius: 16px;
+        font-size: 0.98rem;
+        line-height: 1.65;
+        max-width: 700px;
         margin-bottom: 12px;
     }
 
+    .technology-line {
+        color: #98a2b3;
+        font-size: 0.73rem;
+        letter-spacing: 0.15px;
+    }
+
+
+    /* ======================================================
+       DEPARTMENT CARDS
+       ====================================================== */
+
+    .department-card {
+        background: #ffffff;
+        border: 1px solid #e4e9f0;
+        border-radius: 15px;
+        padding: 17px 16px;
+        min-height: 104px;
+        box-shadow: 0 3px 12px rgba(11, 42, 82, 0.035);
+        transition: all 0.2s ease;
+    }
+
+    .department-card:hover {
+        border-color: #c8d8eb;
+        box-shadow: 0 6px 18px rgba(11, 42, 82, 0.07);
+        transform: translateY(-2px);
+    }
+
+    .department-icon {
+        font-size: 1.25rem;
+        margin-bottom: 5px;
+    }
+
+    .department-name {
+        color: #0b2a52;
+        font-size: 0.88rem;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    .department-description {
+        color: #667085;
+        font-size: 0.72rem;
+        line-height: 1.35;
+    }
+
+
+    /* ======================================================
+       QUICK QUESTIONS
+       ====================================================== */
+
+    .quick-title {
+        color: #0b2a52;
+        font-size: 0.92rem;
+        font-weight: 700;
+        margin-top: 18px;
+        margin-bottom: 4px;
+    }
+
+    .quick-subtitle {
+        color: #98a2b3;
+        font-size: 0.74rem;
+        margin-bottom: 8px;
+    }
+
+    .quick-question button {
+        min-height: 46px;
+    }
+
+
+    /* ======================================================
+       CHAT
+       ====================================================== */
+
+    [data-testid="stChatMessage"] {
+        border-radius: 16px;
+        margin-bottom: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
     [data-testid="stChatMessageContent"] {
-        font-size: 0.96rem;
+        font-size: 0.94rem;
         line-height: 1.65;
     }
 
-    /* -------------------------------------------------------
+    [data-testid="stChatMessageAvatarIcon-user"] {
+        background: #e9eef5;
+    }
+
+    [data-testid="stChatMessageAvatarIcon-assistant"] {
+        background: #e9eef5;
+    }
+
+
+    /* ======================================================
        CHAT INPUT
-    ------------------------------------------------------- */
+       ====================================================== */
 
     [data-testid="stChatInput"] {
-        border-radius: 16px;
+        padding-top: 8px;
     }
 
     [data-testid="stChatInput"] textarea {
         border-radius: 14px !important;
         border: 1px solid #d5dce6 !important;
-        background: white !important;
+        background: #ffffff !important;
+        font-size: 0.92rem !important;
     }
 
-    /* -------------------------------------------------------
-       METADATA BADGES
-    ------------------------------------------------------- */
+    [data-testid="stChatInput"] textarea:focus {
+        border-color: #7b9fc7 !important;
+        box-shadow: 0 0 0 2px rgba(39, 91, 145, 0.08) !important;
+    }
+
+
+    /* ======================================================
+       METADATA
+       ====================================================== */
 
     .metadata-container {
         display: flex;
-        gap: 8px;
+        gap: 7px;
+        flex-wrap: wrap;
         margin-top: 10px;
     }
 
     .metadata-badge {
         display: inline-block;
-        padding: 5px 10px;
+        padding: 4px 9px;
         border-radius: 20px;
         background: #f0f5fb;
         color: #24568c;
-        font-size: 0.72rem;
-        font-weight: 600;
+        font-size: 0.68rem;
+        font-weight: 650;
         border: 1px solid #dbe7f3;
     }
 
     .sentiment-badge {
         display: inline-block;
-        padding: 5px 10px;
+        padding: 4px 9px;
         border-radius: 20px;
         background: #fff7ed;
         color: #c2410c;
-        font-size: 0.72rem;
-        font-weight: 600;
+        font-size: 0.68rem;
+        font-weight: 650;
         border: 1px solid #fed7aa;
     }
 
-    /* -------------------------------------------------------
-       SECTION CARDS
-    ------------------------------------------------------- */
+
+    /* ======================================================
+       SUPPORT SECTION
+       ====================================================== */
 
     .section-card {
-        background: white;
+        background: #ffffff;
         border: 1px solid #e4e9f0;
-        border-radius: 18px;
-        padding: 24px;
-        margin-top: 25px;
-        box-shadow: 0 4px 18px rgba(11, 42, 82, 0.05);
+        border-radius: 17px;
+        padding: 23px;
+        margin-top: 24px;
+        box-shadow: 0 4px 18px rgba(11, 42, 82, 0.045);
     }
 
     .section-title {
         color: #0b2a52;
-        font-size: 1.25rem;
+        font-size: 1.12rem;
         font-weight: 700;
+        margin-bottom: 6px;
     }
 
     .section-description {
         color: #667085;
-        font-size: 0.9rem;
-        line-height: 1.5;
+        font-size: 0.87rem;
+        line-height: 1.55;
     }
 
-    /* -------------------------------------------------------
+    [data-testid="stForm"] {
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid #e4e9f0;
+    }
+
+
+    /* ======================================================
        BUTTONS
-    ------------------------------------------------------- */
+       ====================================================== */
 
     .stButton button {
         border-radius: 10px;
@@ -266,35 +426,51 @@ st.markdown(
         transform: translateY(-1px);
     }
 
-    /* -------------------------------------------------------
-       SUPPORT FORM
-    ------------------------------------------------------- */
 
-    [data-testid="stForm"] {
-        background: white;
-        padding: 22px;
-        border-radius: 16px;
-        border: 1px solid #e4e9f0;
-    }
-
-    /* -------------------------------------------------------
-       DIVIDER
-    ------------------------------------------------------- */
-
-    hr {
-        border-color: #e4e9f0 !important;
-    }
-
-    /* -------------------------------------------------------
+    /* ======================================================
        FOOTER
-    ------------------------------------------------------- */
+       ====================================================== */
 
     .footer {
         text-align: center;
         color: #98a2b3;
-        font-size: 0.78rem;
-        margin-top: 40px;
-        padding-top: 20px;
+        font-size: 0.70rem;
+        margin-top: 38px;
+        padding-top: 18px;
+        border-top: 1px solid #e4e9f0;
+    }
+
+
+    /* ======================================================
+       MOBILE
+       ====================================================== */
+
+    @media (max-width: 700px) {
+
+        .main .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .welcome-card {
+            padding: 25px 20px;
+        }
+
+        .welcome-title {
+            font-size: 1.55rem;
+        }
+
+        .top-header {
+            padding: 12px 15px;
+        }
+
+        .top-header-title {
+            font-size: 1rem;
+        }
+
+        .online-status {
+            font-size: 0.66rem;
+        }
     }
 
     </style>
@@ -309,7 +485,10 @@ st.markdown(
 
 with st.sidebar:
 
-    # Logo
+    # --------------------------------------------------------
+    # EXISTING LOGO — PRESERVED
+    # --------------------------------------------------------
+
     try:
         st.image(
             "assets/shopunow_logo.png",
@@ -319,9 +498,9 @@ with st.sidebar:
         st.markdown(
             """
             <div style="
-                font-size: 1.7rem;
-                font-weight: 750;
-                margin-bottom: 15px;
+                font-size:1.7rem;
+                font-weight:750;
+                margin-bottom:15px;
             ">
                 🛍️ ShopUNow
             </div>
@@ -331,21 +510,24 @@ with st.sidebar:
 
     st.markdown(
         """
-        <div style="
-            color:#b9c9dc;
-            font-size:0.85rem;
-            margin-bottom:20px;
-        ">
+        <div class="sidebar-tagline">
             AI-powered support assistant
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.markdown("### 💡 Try an Example")
+    # --------------------------------------------------------
+    # CHAT CONTROLS
+    # --------------------------------------------------------
+
+    st.markdown(
+        '<div class="sidebar-heading">Quick Actions</div>',
+        unsafe_allow_html=True,
+    )
 
     if st.button(
-        "🗑️  Clear Chat",
+        "↻  Clear Conversation",
         use_container_width=True,
     ):
         st.session_state.messages = []
@@ -360,7 +542,14 @@ with st.sidebar:
 
         st.rerun()
 
-    st.markdown("")
+    # --------------------------------------------------------
+    # EXAMPLES
+    # --------------------------------------------------------
+
+    st.markdown(
+        '<div class="sidebar-heading">Example Questions</div>',
+        unsafe_allow_html=True,
+    )
 
     example_questions = [
         "How do I reset my ShopUNow employee VPN password?",
@@ -373,37 +562,45 @@ with st.sidebar:
         if st.button(
             question,
             use_container_width=True,
+            key=f"example_{question}",
         ):
             st.session_state.pending_question = question
+            st.rerun()
 
     st.divider()
 
-    st.markdown("### Departments")
+    # --------------------------------------------------------
+    # DEPARTMENTS
+    # --------------------------------------------------------
+
+    st.markdown(
+        '<div class="sidebar-heading">Departments</div>',
+        unsafe_allow_html=True,
+    )
 
     departments = [
-        "👥 HR",
-        "💻 IT Support",
-        "💳 Billing & Payments",
-        "📦 Shipping & Delivery",
+        "👥  HR",
+        "💻  IT Support",
+        "💳  Billing & Payments",
+        "📦  Shipping & Delivery",
     ]
 
     for department in departments:
         st.markdown(
-            f"""
-            <div style="
-                padding:7px 0;
-                color:#d7e3f0;
-                font-size:0.88rem;
-            ">
-                {department}
-            </div>
-            """,
+            f'<div class="sidebar-item">{department}</div>',
             unsafe_allow_html=True,
         )
 
     st.divider()
 
-    st.markdown("### 🤖 AI Capabilities")
+    # --------------------------------------------------------
+    # AI CAPABILITIES
+    # --------------------------------------------------------
+
+    st.markdown(
+        '<div class="sidebar-heading">AI Capabilities</div>',
+        unsafe_allow_html=True,
+    )
 
     capabilities = [
         "Department-aware routing",
@@ -416,15 +613,7 @@ with st.sidebar:
 
     for capability in capabilities:
         st.markdown(
-            f"""
-            <div style="
-                padding:5px 0;
-                color:#c9d8e8;
-                font-size:0.82rem;
-            ">
-                ✓ {capability}
-            </div>
-            """,
+            f'<div class="sidebar-capability">✓ {capability}</div>',
             unsafe_allow_html=True,
         )
 
@@ -435,18 +624,22 @@ with st.sidebar:
 
 st.markdown(
     """
-    <div class="brand-header">
-        <div class="brand-title">
-            🛍️ ShopUNow AI Assistant
-        </div>
+    <div class="top-header">
 
-        <div class="brand-subtitle">
-            Intelligent support powered by Agentic AI, RAG & LangGraph
+        <div>
+            <div class="top-header-title">
+                ShopUNow AI Assistant
+            </div>
+
+            <div class="top-header-subtitle">
+                Intelligent retail support
+            </div>
         </div>
 
         <div class="online-status">
             ● AI Assistant Online
         </div>
+
     </div>
     """,
     unsafe_allow_html=True,
@@ -463,14 +656,23 @@ if not st.session_state.messages:
         """
         <div class="welcome-card">
 
+            <div class="welcome-status">
+                ● READY TO HELP
+            </div>
+
             <div class="welcome-title">
                 👋 Welcome to ShopUNow
             </div>
 
             <div class="welcome-text">
-                I'm your AI support assistant. Ask me a question and
-                I'll route it to the right department and provide a
-                knowledge-grounded answer.
+                Your intelligent retail support assistant.
+                Ask a question and I'll connect you with the
+                right department and provide an answer grounded
+                in the ShopUNow knowledge base.
+            </div>
+
+            <div class="technology-line">
+                Powered by Agentic AI · RAG · LangGraph
             </div>
 
         </div>
@@ -478,46 +680,128 @@ if not st.session_state.messages:
         unsafe_allow_html=True,
     )
 
-    col1, col2, col3 = st.columns(3)
+    # --------------------------------------------------------
+    # DEPARTMENT CARDS
+    # --------------------------------------------------------
 
-    with col1:
-        st.markdown(
-            """
-            <div class="capability">
-                <b>🎯 Smart Routing</b><br>
-                Automatically identifies the right department.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    dept_col1, dept_col2, dept_col3, dept_col4 = st.columns(4)
 
-    with col2:
-        st.markdown(
-            """
-            <div class="capability">
-                <b>🧠 Knowledge Grounded</b><br>
-                Answers are based on the ShopUNow knowledge base.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    department_cards = [
+        (
+            dept_col1,
+            "👥",
+            "HR",
+            "Leave, policies & employee support",
+        ),
+        (
+            dept_col2,
+            "💻",
+            "IT Support",
+            "Technical issues & access help",
+        ),
+        (
+            dept_col3,
+            "💳",
+            "Billing & Payments",
+            "Payments, refunds & billing",
+        ),
+        (
+            dept_col4,
+            "📦",
+            "Shipping & Delivery",
+            "Orders, delivery & tracking",
+        ),
+    ]
 
-    with col3:
-        st.markdown(
-            """
-            <div class="capability">
-                <b>👤 Human Support</b><br>
-                Escalates conversations when human help is needed.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+    for column, icon, name, description in department_cards:
 
-    st.markdown("")
+        with column:
+            st.markdown(
+                f"""
+                <div class="department-card">
+
+                    <div class="department-icon">
+                        {icon}
+                    </div>
+
+                    <div class="department-name">
+                        {name}
+                    </div>
+
+                    <div class="department-description">
+                        {description}
+                    </div>
+
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+    # --------------------------------------------------------
+    # QUICK QUESTIONS
+    # --------------------------------------------------------
+
+    st.markdown(
+        """
+        <div class="quick-title">
+            Try asking
+        </div>
+
+        <div class="quick-subtitle">
+            Select a question to start a conversation
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    q_col1, q_col2 = st.columns(2)
+
+    quick_questions = [
+        "How do I request paid time off?",
+        "What should I do if my laptop is running slow?",
+        "How can I request a refund?",
+        "Where can I check my order status?",
+    ]
+
+    with q_col1:
+
+        if st.button(
+            "💬  How do I request paid time off?",
+            use_container_width=True,
+            key="quick_q1",
+        ):
+            st.session_state.pending_question = quick_questions[0]
+            st.rerun()
+
+        if st.button(
+            "💬  How can I request a refund?",
+            use_container_width=True,
+            key="quick_q3",
+        ):
+            st.session_state.pending_question = quick_questions[2]
+            st.rerun()
+
+    with q_col2:
+
+        if st.button(
+            "💬  What should I do if my laptop is running slow?",
+            use_container_width=True,
+            key="quick_q2",
+        ):
+            st.session_state.pending_question = quick_questions[1]
+            st.rerun()
+
+        if st.button(
+            "💬  Where can I check my order status?",
+            use_container_width=True,
+            key="quick_q4",
+        ):
+            st.session_state.pending_question = quick_questions[3]
+            st.rerun()
 
 
 # ============================================================
-# DISPLAY PREVIOUS MESSAGES
+# DISPLAY CONVERSATION
 # ============================================================
 
 for message in st.session_state.messages:
@@ -547,6 +831,7 @@ for message in st.session_state.messages:
             st.markdown(
                 f"""
                 <div class="metadata-container">
+
                     <span class="metadata-badge">
                         🏢 {department}
                     </span>
@@ -554,6 +839,7 @@ for message in st.session_state.messages:
                     <span class="sentiment-badge">
                         💬 {sentiment}
                     </span>
+
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -565,7 +851,7 @@ for message in st.session_state.messages:
 # ============================================================
 
 query = st.chat_input(
-    "Ask your ShopUNow question..."
+    "Ask ShopUNow a question..."
 )
 
 if "pending_question" in st.session_state:
@@ -627,6 +913,7 @@ if query:
             st.markdown(
                 f"""
                 <div class="metadata-container">
+
                     <span class="metadata-badge">
                         🏢 {department}
                     </span>
@@ -634,6 +921,7 @@ if query:
                     <span class="sentiment-badge">
                         💬 {sentiment}
                     </span>
+
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -650,7 +938,10 @@ if query:
             }
         )
 
-        # Human escalation detected
+        # ----------------------------------------------------
+        # HUMAN ESCALATION DETECTED
+        # ----------------------------------------------------
+
         if result.get(
             "needs_escalation",
             False,
@@ -684,18 +975,16 @@ if (
             </div>
 
             <div class="section-description">
-                It looks like this conversation would benefit from
-                human assistance. Please provide your contact
-                information and a ShopUNow support representative
-                will follow up with you.
+                It looks like this conversation would benefit
+                from human assistance. Please provide your
+                contact information and a ShopUNow support
+                representative will follow up with you.
             </div>
 
         </div>
         """,
         unsafe_allow_html=True,
     )
-
-    st.markdown("")
 
     with st.form(
         "human_support_form"
@@ -789,8 +1078,6 @@ if st.session_state.escalation_confirmation:
         unsafe_allow_html=True,
     )
 
-    st.markdown("")
-
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -834,11 +1121,14 @@ if st.session_state.escalation_confirmation:
 st.markdown(
     """
     <div class="footer">
-        ShopUNow AI Assistant &nbsp;•&nbsp;
-        Agentic AI &nbsp;•&nbsp;
-        RAG &nbsp;•&nbsp;
+        ShopUNow AI Assistant
+        &nbsp;•&nbsp;
+        Agentic AI
+        &nbsp;•&nbsp;
+        RAG
+        &nbsp;•&nbsp;
         LangGraph
     </div>
     """,
     unsafe_allow_html=True,
-)         
+)
