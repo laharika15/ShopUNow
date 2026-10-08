@@ -1,21 +1,20 @@
+import uuid
 import streamlit as st
+
 from database import initialize_database
 from agent import run_agent
+from memory import conversation_memory
 
 initialize_database()
 
-# -----------------------------
 # Page configuration
-# -----------------------------
 st.set_page_config(
     page_title="ShopUNow AI Assistant",
     page_icon="🛍️",
     layout="centered"
 )
 
-# -----------------------------
 # Custom styling
-# -----------------------------
 st.markdown("""
 <style>
     .main-title {
@@ -32,9 +31,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# -----------------------------
 # Header
-# -----------------------------
 st.markdown(
     '<div class="main-title">🛍️ ShopUNow AI Assistant</div>',
     unsafe_allow_html=True
@@ -49,16 +46,14 @@ st.markdown(
 
 st.divider()
 
-# -----------------------------
 # Session state
-# -----------------------------
-import uuid
+
 if "session_id" not in st.session_state:
-    st.session_state.session_id = str(
-        uuid.uuid4()
-    )
+    st.session_state.session_id = str(uuid.uuid4())
+
 if "messages" not in st.session_state:
     st.session_state.messages = []
+
 if "escalation_pending" not in st.session_state:
     st.session_state.escalation_pending = False
 
@@ -67,22 +62,25 @@ if "escalation_query" not in st.session_state:
 
 if "escalation_confirmation" not in st.session_state:
     st.session_state.escalation_confirmation = None
-# -----------------------------
+
 # Sidebar
-# -----------------------------
 with st.sidebar:
+
     st.header("💡 Try an Example")
 
     if st.button("🗑️ Clear Chat", use_container_width=True):
-    from memory import conversation_memory
 
-    st.session_state.messages = []
+        st.session_state.messages = []
 
-    conversation_memory.clear(
-        st.session_state.session_id
-    )
+        conversation_memory.clear(
+            st.session_state.session_id
+        )
 
-    st.rerun()
+        st.session_state.escalation_pending = False
+        st.session_state.escalation_query = ""
+        st.session_state.escalation_confirmation = None
+
+        st.rerun()
 
     example_questions = [
         "How do I reset my ShopUNow employee VPN password?",
@@ -92,6 +90,7 @@ with st.sidebar:
     ]
 
     for question in example_questions:
+
         if st.button(question, use_container_width=True):
             st.session_state.pending_question = question
 
@@ -113,14 +112,16 @@ with st.sidebar:
     st.write("• Contact information collection")
     st.write("• Hallucination prevention")
 
-# -----------------------------
 # Display previous messages
-# -----------------------------
+
 for message in st.session_state.messages:
+
     with st.chat_message(message["role"]):
+
         st.write(message["content"])
 
         if message["role"] == "assistant" and "metadata" in message:
+
             st.divider()
 
             col1, col2 = st.columns(2)
@@ -133,17 +134,15 @@ for message in st.session_state.messages:
                 st.caption("Sentiment")
                 st.write(message["metadata"]["sentiment"])
 
-# -----------------------------
 # Get user input
-# -----------------------------
+
 query = st.chat_input("Ask your ShopUNow question...")
 
 if "pending_question" in st.session_state:
     query = st.session_state.pop("pending_question")
 
-# -----------------------------
 # Process query
-# -----------------------------
+
 if query:
 
     st.session_state.messages.append({
@@ -155,14 +154,16 @@ if query:
         st.write(query)
 
     try:
+
         with st.chat_message("assistant"):
 
             with st.spinner(
                 "🤖 ShopUNow AI is analyzing your question..."
             ):
-               result = run_agent(
+
+                result = run_agent(
                     query=query,
-                    session_id=st.session_state.session_id,
+                    session_id=st.session_state.session_id
                 )
 
             st.write(result["response"])
@@ -188,21 +189,18 @@ if query:
                 }
             })
 
-            # -----------------------------
             # Human escalation detected
-            # -----------------------------
+         
             if result.get("needs_escalation", False):
 
                 st.session_state.escalation_pending = True
                 st.session_state.escalation_query = query
 
     except Exception as e:
+
         st.error(f"Something went wrong: {e}")
 
-
-# -----------------------------
 # Human Support Contact Form
-# -----------------------------
 if (
     st.session_state.escalation_pending
     and not st.session_state.escalation_confirmation
@@ -242,15 +240,19 @@ if (
         if submitted:
 
             if not name.strip():
+
                 st.error("Please enter your name.")
 
             elif not phone.strip():
+
                 st.error("Please enter your phone number.")
 
             elif not email.strip():
+
                 st.error("Please enter your email address.")
 
             elif "@" not in email:
+
                 st.error("Please enter a valid email address.")
 
             else:
@@ -265,10 +267,8 @@ if (
 
                 st.rerun()
 
-
-# -----------------------------
 # Escalation Confirmation
-# -----------------------------
+
 if st.session_state.escalation_confirmation:
 
     contact = st.session_state.escalation_confirmation
@@ -289,11 +289,12 @@ if st.session_state.escalation_confirmation:
         "Thank you! A ShopUNow support representative "
         "will reach out to you soon."
     )
-
     if st.button(
         "Start New Support Request",
         use_container_width=True
     ):
+
         st.session_state.escalation_confirmation = None
         st.session_state.escalation_query = ""
+
         st.rerun()
