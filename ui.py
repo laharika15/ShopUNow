@@ -1,4 +1,6 @@
 import uuid
+import json
+import time
 import streamlit as st
 
 from database import initialize_database
@@ -15,7 +17,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Initialize database
+# Initialize backend data structures
 initialize_database()
 
 # ============================================================
@@ -27,7 +29,7 @@ if "session_id" not in st.session_state:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Dynamic prompt buffer for sidebar actions
+# Dynamic prompt buffer for sidebar button interactions
 if "active_prompt" not in st.session_state:
     st.session_state.active_prompt = None
 
@@ -47,7 +49,7 @@ st.markdown(
         background-color: #0B2545 !important;
     }
     
-    /* Target only text labels to be white */
+    /* Target structural sidebar metadata text labels to be white */
     [data-testid="stSidebar"] h1, 
     [data-testid="stSidebar"] h2, 
     [data-testid="stSidebar"] h3, 
@@ -57,7 +59,7 @@ st.markdown(
         color: #FFFFFF !important;
     }
     
-    /* FIX FOR SIDEBAR BUTTON TRANSPARENCY & VISIBILITY */
+    /* SIDEBAR BUTTON TRANSPARENCY & HIGH-CONTRAST TEXT */
     [data-testid="stSidebar"] .stButton button {
         background-color: rgba(255, 255, 255, 0.08) !important;
         color: #FFFFFF !important;
@@ -66,12 +68,12 @@ st.markdown(
         transition: all 0.2s ease-in-out;
     }
     
-    /* Force internal nested paragraphs inside buttons to stay white */
+    /* Force inner paragraph tags inside buttons to remain visible */
     [data-testid="stSidebar"] .stButton button p {
         color: #FFFFFF !important;
     }
     
-    /* Hover state for buttons */
+    /* Hover interactive state for sidebar elements */
     [data-testid="stSidebar"] .stButton button:hover {
         background-color: rgba(255, 255, 255, 0.18) !important;
         color: #FFFFFF !important;
@@ -81,13 +83,13 @@ st.markdown(
         color: #FFFFFF !important;
     }
 
-    /* Main Content Container Framework */
+    /* Main Content Container Layout Alignment Framework */
     .main .block-container {
         max-width: 1000px;
         padding-top: 2rem;
     }
 
-    /* Custom Main Panel Header Cards */
+    /* Custom Welcoming Header Cards */
     .header-container {
         background-color: #FFFFFF;
         padding: 1.5rem;
@@ -127,17 +129,37 @@ st.markdown(
 )
 
 # ============================================================
+# AVATAR DEFINITION ROUTERS
+# ============================================================
+USER_AVATAR = "👤"
+
+# Fallback wrapper: Uses your brand logo file for assistant avatars if present
+try:
+    with open("assets/shopunow_logo.png", "rb") as f:
+        BOT_AVATAR = "assets/shopunow_logo.png"
+except FileNotFoundError:
+    BOT_AVATAR = "🛍️"
+
+# ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+def text_streamer(text_block: str):
+    """Simulates a natural word-by-word streaming animation."""
+    for word in text_block.split(" "):
+        yield word + " "
+        time.sleep(0.04)
+
+# ============================================================
 # SIDEBAR NAVIGATION & QUICK ACTIONS
 # ============================================================
 with st.sidebar:
-    # EXACT LOGO ASSET IMPLEMENTATION
+    # Exact Local Path Image Rendering
     try:
         st.image(
             "assets/shopunow_logo.png",
             width=210,
         )
     except Exception:
-        # Graceful absolute fallback text if assets directory tracking desyncs
         st.title("🛍️ ShopUNow")
         st.caption("AI-powered support assistant")
         
@@ -191,7 +213,7 @@ with st.sidebar:
 # MAIN INTERFACE RENDERER
 # ============================================================
 
-# CONDITIONAL WELCOME HEADERS (Only show if there is no chat history yet)
+# Conditional Welcome Banner Header (Disappears when chat log populated)
 if not st.session_state.messages:
     st.markdown(
         """
@@ -205,34 +227,79 @@ if not st.session_state.messages:
     )
     st.markdown('<div class="welcome-status">● READY TO HELP</div>', unsafe_allow_html=True)
 
-# Render Existing Chat Log
+# Render Historical Chat Log Thread with custom avatars and structural metrics
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
+    current_avatar = USER_AVATAR if message["role"] == "user" else BOT_AVATAR
+    with st.chat_message(message["role"], avatar=current_avatar):
         st.write(message["content"])
+        
+        # Display meta metrics beneath bot responses if present
+        if message["role"] == "assistant" and "metadata" in message:
+            meta = message["metadata"]
+            meta_cols = st.columns([1, 1, 1, 4])
+            meta_cols[0].caption(f"📁 **Dept:** {meta.get('department', 'N/A')}")
+            meta_cols[1].caption(f"🎭 **Sentiment:** {meta.get('sentiment', 'N/A')}")
+            meta_cols[2].caption(f"🎯 **Scope:** {meta.get('scope', 'In-Scope')}")
 
-# Handle Prompt Inputs (From sidebar interactions or manual field entry)
+# Capture Text Submission Input
 user_input = st.chat_input("Ask ShopUNow a question...")
 final_prompt = None
 
 if st.session_state.active_prompt:
     final_prompt = st.session_state.active_prompt
-    st.session_state.active_prompt = None  # Flush buffer immediately
+    st.session_state.active_prompt = None  # Consume and flush buffer
 elif user_input:
     final_prompt = user_input
 
-# Process the Message submission
+# Execute Response Workflows
 if final_prompt:
-    with st.chat_message("user"):
+    # Render user prompt with avatar
+    with st.chat_message("user", avatar=USER_AVATAR):
         st.write(final_prompt)
     st.session_state.messages.append({"role": "user", "content": final_prompt})
     
-    with st.chat_message("assistant"):
+    # Render bot feedback block with avatar
+    with st.chat_message("assistant", avatar=BOT_AVATAR):
         with st.spinner("Processing request..."):
-            try:
-                response = run_agent(final_prompt, st.session_state.session_id)
-            except Exception:
-                response = "I have logged your request. Let me know if you need specific step-by-step assistance."
-            st.write(response)
             
-    st.session_state.messages.append({"role": "assistant", "content": response})
-    st.rerun()
+            department_meta = "Unknown"
+            sentiment_meta = "Neutral"
+            scope_meta = "In-Scope"
+            
+            try:
+                # 1. Capture raw workspace backend output
+                raw_response = run_agent(final_prompt, st.session_state.session_id)
+                
+                # 2. Extract cleanly targeted human response & metrics from metadata wrapper
+                try:
+                    if isinstance(raw_response, dict):
+                        response_data = raw_response
+                    else:
+                        response_data = json.loads(raw_response)
+                        
+                    clean_output = response_data.get("response", "Could not fetch message contents.")
+                    department_meta = response_data.get("department", "General")
+sentiment_meta = response_data.get("sentiment", "Neutral")
+scope_meta = response_data.get("scope", "In-Scope")
+except (json.JSONDecodeError, TypeError):
+clean_output = str(raw_response)
+except Exception:
+clean_output = "I encountered an issue processing your request. Please try your message again."
+# 3. Output beautiful real-time text stream to user interface view
+st.write_stream(text_streamer(clean_output))
+# 4. Render immediate metadata logging pills beneath the stream
+live_cols = st.columns([1, 1, 1, 4])
+live_cols[0].caption(f"📁 Dept: {department_meta}")
+live_cols[1].caption(f"🎭 Sentiment: {sentiment_meta}")
+live_cols[2].caption(f"🎯 Scope: {scope_meta}")
+# Cache everything into state memory thread pool
+st.session_state.messages.append({
+"role": "assistant",
+"content": clean_output,
+"metadata": {
+"department": department_meta,
+"sentiment": sentiment_meta,
+"scope": scope_meta
+}
+})
+st.rerun()
