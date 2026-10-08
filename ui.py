@@ -1,4 +1,3 @@
-```python
 import uuid
 import json
 import time
@@ -582,4 +581,3 @@ if final_prompt:
     # RERUN APPLICATION
     # ========================================================
     st.rerun()
-```
