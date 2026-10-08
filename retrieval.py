@@ -94,7 +94,7 @@ SYNONYM_MAP = {
         "login",
         "account access"
     ],
-    laptop": [
+    "laptop": [
         "computer",
         "pc",
         "device",
