@@ -20,13 +20,13 @@ st.set_page_config(
 
 
 # ============================================================
-# INITIALIZE BACKEND DATA STRUCTURES
+# INITIALIZE BACKEND
 # ============================================================
 initialize_database()
 
 
 # ============================================================
-# SESSION STATE POOL
+# SESSION STATE
 # ============================================================
 if "session_id" not in st.session_state:
     st.session_state.session_id = str(uuid.uuid4())
@@ -39,26 +39,44 @@ if "active_prompt" not in st.session_state:
 
 
 # ============================================================
-# MODERN ENTERPRISE UI STYLING
+# GLOBAL UI STYLING
 # ============================================================
 st.markdown(
     """
     <style>
 
     /* ========================================================
-       GLOBAL APP BACKGROUND
+       GLOBAL APP
        ======================================================== */
+
     .stApp {
         background-color: #F4F6F9;
     }
 
 
     /* ========================================================
-       SIDEBAR
+       MAIN CONTENT WIDTH
        ======================================================== */
+
+    .main .block-container {
+        max-width: 1000px;
+        padding-top: 2rem;
+        padding-bottom: 5rem;
+    }
+
+
+    /* ========================================================
+       SIDEBAR BACKGROUND
+       ======================================================== */
+
     [data-testid="stSidebar"] {
         background-color: #0B2545 !important;
     }
+
+
+    /* ========================================================
+       SIDEBAR TEXT
+       ======================================================== */
 
     [data-testid="stSidebar"] h1,
     [data-testid="stSidebar"] h2,
@@ -73,6 +91,7 @@ st.markdown(
     /* ========================================================
        SIDEBAR BUTTONS
        ======================================================== */
+
     [data-testid="stSidebar"] .stButton button {
         background-color: rgba(255, 255, 255, 0.08) !important;
         color: #FFFFFF !important;
@@ -81,9 +100,11 @@ st.markdown(
         transition: all 0.2s ease-in-out;
     }
 
+
     [data-testid="stSidebar"] .stButton button p {
         color: #FFFFFF !important;
     }
+
 
     [data-testid="stSidebar"] .stButton button:hover {
         background-color: rgba(255, 255, 255, 0.18) !important;
@@ -91,59 +112,18 @@ st.markdown(
         border: 1px solid #10B981 !important;
     }
 
+
     [data-testid="stSidebar"] .stButton button:hover p {
         color: #FFFFFF !important;
     }
 
 
     /* ========================================================
-       MAIN CONTENT CONTAINER
+       CHAT INPUT
        ======================================================== */
-    .main .block-container {
-        max-width: 1000px;
-        padding-top: 2rem;
-    }
 
-
-    /* ========================================================
-       WELCOME HEADER
-       ======================================================== */
-    .header-container {
-        background-color: #FFFFFF;
-        padding: 1.5rem;
+    [data-testid="stChatInput"] {
         border-radius: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        margin-bottom: 1rem;
-    }
-
-    .top-header-title {
-        font-size: 24px;
-        font-weight: 700;
-        color: #1E293B !important;
-    }
-
-    .top-header-subtitle {
-        font-size: 14px;
-        color: #64748B !important;
-    }
-
-    .online-status {
-        font-size: 13px;
-        color: #10B981 !important;
-        font-weight: 600;
-        margin-top: 0.5rem;
-    }
-
-    .welcome-status {
-        font-size: 12px;
-        color: #059669 !important;
-        font-weight: 700;
-        letter-spacing: 0.05em;
-        background-color: #D1FAE5;
-        padding: 4px 8px;
-        border-radius: 4px;
-        display: inline-block;
-        margin-top: 0.5rem;
     }
 
     </style>
@@ -165,36 +145,39 @@ except FileNotFoundError:
 
 
 # ============================================================
-# HELPER FUNCTIONS
+# HELPER FUNCTION
 # ============================================================
 def text_streamer(text_block: str):
     """
-    Simulates natural word-by-word streaming animation.
+    Simulates a natural word-by-word response stream.
     """
+
     if not text_block:
         return
 
-    for word in str(text_block).split(" "):
+    for word in str(text_block).split():
         yield word + " "
         time.sleep(0.04)
 
 
 # ============================================================
-# SIDEBAR NAVIGATION & QUICK ACTIONS
+# SIDEBAR
 # ============================================================
 with st.sidebar:
 
     # --------------------------------------------------------
-    # SHOPUNOW LOGO
+    # LOGO
     # --------------------------------------------------------
     try:
         st.image(
             "assets/shopunow_logo.png",
             width=210,
         )
+
     except Exception:
         st.title("🛍️ ShopUNow")
         st.caption("AI-powered support assistant")
+
 
     st.write("---")
 
@@ -204,13 +187,17 @@ with st.sidebar:
     # --------------------------------------------------------
     st.subheader("QUICK ACTIONS")
 
+
     if st.button(
         "🔄 Clear Conversation",
         use_container_width=True,
     ):
+
         st.session_state.messages = []
         st.session_state.active_prompt = None
+
         st.rerun()
+
 
     st.write("---")
 
@@ -220,40 +207,52 @@ with st.sidebar:
     # --------------------------------------------------------
     st.subheader("EXAMPLE QUESTIONS")
 
+
     if st.button(
         "How do I reset my ShopUNow employee VPN password?",
         use_container_width=True,
     ):
+
         st.session_state.active_prompt = (
             "How do I reset my ShopUNow employee VPN password?"
         )
+
         st.rerun()
+
 
     if st.button(
         "How do I apply for a vacation day?",
         use_container_width=True,
     ):
+
         st.session_state.active_prompt = (
             "How do I apply for a vacation day?"
         )
+
         st.rerun()
+
 
     if st.button(
         "What should I do if my laptop is running slow?",
         use_container_width=True,
     ):
+
         st.session_state.active_prompt = (
             "What should I do if my laptop is running slow?"
         )
+
         st.rerun()
+
 
     if st.button(
         "I am extremely frustrated because my VPN has been broken for days!",
         use_container_width=True,
     ):
+
         st.session_state.active_prompt = (
             "I am extremely frustrated because my VPN has been broken for days!"
         )
+
         st.rerun()
 
 
@@ -265,40 +264,52 @@ with st.sidebar:
     # --------------------------------------------------------
     st.subheader("DEPARTMENTS")
 
+
     if st.button(
         "👥 HR Department",
         use_container_width=True,
     ):
+
         st.session_state.active_prompt = (
             "I need assistance from the HR department regarding company policy."
         )
+
         st.rerun()
+
 
     if st.button(
         "💻 IT Support",
         use_container_width=True,
     ):
+
         st.session_state.active_prompt = (
             "I need to open an IT technical support request."
         )
+
         st.rerun()
+
 
     if st.button(
         "💳 Billing & Payments",
         use_container_width=True,
     ):
+
         st.session_state.active_prompt = (
             "I have a question about vendor billing or employee payments."
         )
+
         st.rerun()
+
 
     if st.button(
         "📦 Shipping & Delivery",
         use_container_width=True,
     ):
+
         st.session_state.active_prompt = (
             "Show me the tracking options or shipping department procedures."
         )
+
         st.rerun()
 
 
@@ -306,27 +317,60 @@ with st.sidebar:
 # MAIN INTERFACE RENDERER
 # ============================================================
 
-# Conditional Welcome Banner Header
-# Disappears automatically when chat history is populated.
+# ------------------------------------------------------------
+# WELCOME HEADER
+# ------------------------------------------------------------
+# This appears only when there is no conversation.
+# ------------------------------------------------------------
 if not st.session_state.messages:
 
     st.markdown(
         """
-        <div class="header-container">
+        <div style="
+            background-color: #FFFFFF;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 16px;
+        ">
 
-            <div class="top-header-title">
+            <div style="
+                font-size: 24px;
+                font-weight: 700;
+                color: #1E293B;
+                line-height: 1.3;
+            ">
                 ShopUNow AI Assistant
             </div>
 
-            <div class="top-header-subtitle">
+            <div style="
+                font-size: 14px;
+                color: #64748B;
+                margin-top: 4px;
+            ">
                 Intelligent retail support
             </div>
 
-            <div class="online-status">
+            <div style="
+                font-size: 13px;
+                color: #10B981;
+                font-weight: 600;
+                margin-top: 10px;
+            ">
                 ● AI Assistant Online
             </div>
 
-            <div class="welcome-status">
+            <div style="
+                font-size: 12px;
+                color: #059669;
+                font-weight: 700;
+                letter-spacing: 0.05em;
+                background-color: #D1FAE5;
+                padding: 4px 8px;
+                border-radius: 4px;
+                display: inline-block;
+                margin-top: 10px;
+            ">
                 ● READY TO HELP
             </div>
 
@@ -337,7 +381,7 @@ if not st.session_state.messages:
 
 
 # ============================================================
-# RENDER HISTORICAL CHAT LOG THREAD
+# HISTORICAL CHAT LOG
 # ============================================================
 for message in st.session_state.messages:
 
@@ -347,6 +391,7 @@ for message in st.session_state.messages:
         else BOT_AVATAR
     )
 
+
     with st.chat_message(
         message["role"],
         avatar=current_avatar,
@@ -354,8 +399,9 @@ for message in st.session_state.messages:
 
         st.write(message["content"])
 
+
         # ----------------------------------------------------
-        # DISPLAY HISTORICAL ASSISTANT METADATA
+        # HISTORICAL ASSISTANT METADATA
         # ----------------------------------------------------
         if (
             message["role"] == "assistant"
@@ -366,15 +412,18 @@ for message in st.session_state.messages:
 
             hist_cols = st.columns(3)
 
+
             hist_cols[0].caption(
                 f"📁 **Dept:** "
                 f"{meta.get('department', 'N/A')}"
             )
 
+
             hist_cols[1].caption(
                 f"🎭 **Sentiment:** "
                 f"{meta.get('sentiment', 'N/A')}"
             )
+
 
             hist_cols[2].caption(
                 f"🎯 **Scope:** "
@@ -393,14 +442,16 @@ final_prompt = None
 
 
 # ============================================================
-# PROCESS SIDEBAR PROMPT OR CHAT INPUT
+# DETERMINE FINAL PROMPT
 # ============================================================
+
 if st.session_state.active_prompt:
 
     final_prompt = st.session_state.active_prompt
 
-    # Consume prompt so it is executed only once.
+    # Consume sidebar prompt.
     st.session_state.active_prompt = None
+
 
 elif user_input:
 
@@ -413,15 +464,19 @@ elif user_input:
 if final_prompt:
 
     # --------------------------------------------------------
-    # RENDER USER MESSAGE
+    # DISPLAY USER MESSAGE
     # --------------------------------------------------------
     with st.chat_message(
         "user",
         avatar=USER_AVATAR,
     ):
+
         st.write(final_prompt)
 
-    # Save user message to session history.
+
+    # --------------------------------------------------------
+    # SAVE USER MESSAGE
+    # --------------------------------------------------------
     st.session_state.messages.append(
         {
             "role": "user",
@@ -431,7 +486,7 @@ if final_prompt:
 
 
     # --------------------------------------------------------
-    # RENDER ASSISTANT RESPONSE
+    # ASSISTANT RESPONSE
     # --------------------------------------------------------
     with st.chat_message(
         "assistant",
@@ -440,7 +495,9 @@ if final_prompt:
 
         with st.spinner("Processing request..."):
 
-            # Default metadata
+            # ------------------------------------------------
+            # DEFAULT VALUES
+            # ------------------------------------------------
             department_meta = "General"
             sentiment_meta = "Neutral"
             scope_meta = "In-Scope"
@@ -448,7 +505,7 @@ if final_prompt:
 
 
             # =================================================
-            # CALL BACKEND AGENT
+            # CALL AGENT
             # =================================================
             try:
 
@@ -459,7 +516,7 @@ if final_prompt:
 
 
                 # =================================================
-                # PARSE RESPONSE
+                # PARSE AGENT RESPONSE
                 # =================================================
                 if isinstance(raw_response, dict):
 
@@ -473,22 +530,25 @@ if final_prompt:
 
 
                 # =================================================
-                # EXTRACT RESPONSE CONTENT
+                # EXTRACT RESPONSE
                 # =================================================
                 clean_output = response_data.get(
                     "response",
                     "Could not fetch message contents.",
                 )
 
+
                 department_meta = response_data.get(
                     "department",
                     "General",
                 )
 
+
                 sentiment_meta = response_data.get(
                     "sentiment",
                     "Neutral",
                 )
+
 
                 scope_meta = response_data.get(
                     "scope",
@@ -497,7 +557,7 @@ if final_prompt:
 
 
             # =================================================
-            # FALLBACK FOR PLAIN-TEXT RESPONSE
+            # PLAIN TEXT FALLBACK
             # =================================================
             except (
                 json.JSONDecodeError,
@@ -508,7 +568,7 @@ if final_prompt:
 
 
             # =================================================
-            # ABSOLUTE SAFETY FALLBACK
+            # GENERAL ERROR FALLBACK
             # =================================================
             except Exception:
 
@@ -519,7 +579,7 @@ if final_prompt:
 
 
             # =================================================
-            # ENSURE OUTPUT IS ALWAYS A STRING
+            # ENSURE VALID OUTPUT
             # =================================================
             if clean_output is None:
 
@@ -527,11 +587,12 @@ if final_prompt:
                     "I could not generate a response."
                 )
 
+
             clean_output = str(clean_output)
 
 
             # =================================================
-            # STREAM RESPONSE TO USER
+            # STREAM RESPONSE
             # =================================================
             st.write_stream(
                 text_streamer(clean_output)
@@ -539,17 +600,20 @@ if final_prompt:
 
 
             # =================================================
-            # DISPLAY LIVE METADATA
+            # LIVE METADATA
             # =================================================
             live_cols = st.columns(3)
+
 
             live_cols[0].caption(
                 f"📁 Dept: {department_meta}"
             )
 
+
             live_cols[1].caption(
                 f"🎭 Sentiment: {sentiment_meta}"
             )
+
 
             live_cols[2].caption(
                 f"🎯 Scope: {scope_meta}"
@@ -557,7 +621,7 @@ if final_prompt:
 
 
             # =================================================
-            # SAVE ASSISTANT RESPONSE TO SESSION STATE
+            # SAVE ASSISTANT RESPONSE
             # =================================================
             st.session_state.messages.append(
                 {
@@ -573,6 +637,6 @@ if final_prompt:
 
 
     # ========================================================
-    # RERUN APPLICATION
+    # REFRESH UI
     # ========================================================
     st.rerun()
