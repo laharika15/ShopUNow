@@ -1,404 +1,397 @@
-import uuid
+import re
+import html
 import streamlit as st
 
 from database import initialize_database
-from agent import run_agent
-from memory import conversation_memory
+from agent import graph_app
 
-# INITIALIZATION
-initialize_database()
+# PAGE CONFIGURATION
 
 st.set_page_config(
-    page_title="ShopUNow AI Assistant",
+    page_title="ShopUNow | AI Support",
     page_icon="🛍️",
     layout="wide",
     initial_sidebar_state="expanded",
 )
 
-# SESSION STATE
+# DATABASE
 
-if "session_id" not in st.session_state:
-    st.session_state.session_id = str(uuid.uuid4())
+initialize_database()
 
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-if "escalation_pending" not in st.session_state:
-    st.session_state.escalation_pending = False
-
-if "escalation_query" not in st.session_state:
-    st.session_state.escalation_query = ""
-
-if "escalation_confirmation" not in st.session_state:
-    st.session_state.escalation_confirmation = None
-
-# CUSTOM DESIGN
+# CUSTOM CSS
 
 st.markdown(
     """
     <style>
 
-    /* -------------------------------------------------------
-       GLOBAL
-    ------------------------------------------------------- */
+    /* ---------- GLOBAL ---------- */
 
     .stApp {
         background: #f7f9fc;
     }
 
-    .main .block-container {
-        max-width: 1100px;
+    .block-container {
+        max-width: 1180px;
         padding-top: 2rem;
-        padding-bottom: 4rem;
+        padding-bottom: 5rem;
     }
 
-    /* -------------------------------------------------------
-       SIDEBAR
-    ------------------------------------------------------- */
+    /* ---------- HEADER ---------- */
 
-    [data-testid="stSidebar"] {
-        background: #0b2a52;
-        border-right: 1px solid #163f70;
+    .shop-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 6px;
     }
 
-    [data-testid="stSidebar"] * {
-        color: white;
+    .shop-logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 15px;
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.20);
     }
 
-    [data-testid="stSidebar"] .stButton button {
-        background: rgba(255,255,255,0.08);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 10px;
-        text-align: left;
-        transition: all 0.2s ease;
-    }
-
-    [data-testid="stSidebar"] .stButton button:hover {
-        background: rgba(255,255,255,0.16);
-        border-color: #ff9d24;
-        color: white;
-    }
-
-    /* -------------------------------------------------------
-       HEADER
-    ------------------------------------------------------- */
-
-    .brand-header {
-        background: white;
-        border-radius: 18px;
-        padding: 18px 24px;
-        margin-bottom: 20px;
-        border: 1px solid #e4e9f0;
-        box-shadow: 0 4px 18px rgba(11, 42, 82, 0.06);
-    }
-
-    .brand-title {
-        font-size: 2rem;
+    .shop-title {
+        font-size: 2.15rem;
         font-weight: 750;
-        color: #0b2a52;
-        margin-bottom: 2px;
+        color: #111827;
+        letter-spacing: -0.7px;
+        line-height: 1.1;
     }
 
-    .brand-subtitle {
-        color: #667085;
-        font-size: 0.95rem;
-        margin-top: 0;
+    .shop-subtitle {
+        color: #64748b;
+        font-size: 0.98rem;
+        margin-top: 4px;
     }
 
-    .online-status {
+    /* ---------- STATUS ---------- */
+
+    .status-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 15px;
+        margin-bottom: 24px;
+    }
+
+    .status-dot {
+        width: 9px;
+        height: 9px;
+        background: #22c55e;
+        border-radius: 50%;
         display: inline-block;
-        background: #ecfdf3;
-        color: #15803d;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.78rem;
-        font-weight: 600;
-        margin-top: 8px;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
     }
 
-    /* -------------------------------------------------------
-       WELCOME CARD
-    ------------------------------------------------------- */
+    .status-text {
+        font-size: 0.82rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    /* ---------- WELCOME CARD ---------- */
 
     .welcome-card {
-        background: linear-gradient(
-            135deg,
-            #ffffff 0%,
-            #f4f8ff 100%
-        );
-        border: 1px solid #dce6f3;
+        background: white;
+        border: 1px solid #e5e7eb;
         border-radius: 20px;
-        padding: 32px;
-        margin: 20px 0 25px 0;
-        box-shadow: 0 6px 24px rgba(11, 42, 82, 0.06);
+        padding: 30px;
+        margin-bottom: 24px;
+        box-shadow: 0 8px 30px rgba(15, 23, 42, 0.05);
     }
 
     .welcome-title {
-        color: #0b2a52;
-        font-size: 1.65rem;
+        font-size: 1.45rem;
         font-weight: 700;
+        color: #111827;
         margin-bottom: 8px;
     }
 
     .welcome-text {
-        color: #667085;
-        font-size: 1rem;
+        color: #64748b;
+        font-size: 0.96rem;
         line-height: 1.6;
     }
 
-    .capability {
+    /* ---------- CAPABILITY CARDS ---------- */
+
+    .capability-card {
         background: white;
-        border: 1px solid #e5eaf1;
-        border-radius: 12px;
-        padding: 14px;
-        margin-top: 10px;
-        color: #344054;
-        font-size: 0.9rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 18px;
+        min-height: 120px;
+        box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
     }
 
-    /* -------------------------------------------------------
-       CHAT
-    ------------------------------------------------------- */
+    .capability-icon {
+        font-size: 23px;
+        margin-bottom: 8px;
+    }
+
+    .capability-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 5px;
+    }
+
+    .capability-text {
+        font-size: 0.78rem;
+        color: #64748b;
+        line-height: 1.45;
+    }
+
+    /* ---------- CHAT ---------- */
 
     [data-testid="stChatMessage"] {
-        border-radius: 16px;
-        margin-bottom: 12px;
+        border-radius: 18px;
+        padding: 6px 2px;
     }
 
     [data-testid="stChatMessageContent"] {
-        font-size: 0.96rem;
+        font-size: 0.95rem;
         line-height: 1.65;
     }
 
-    /* -------------------------------------------------------
-       CHAT INPUT
-    ------------------------------------------------------- */
+    /* ---------- METADATA CARD ---------- */
+
+    .metadata-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 15px;
+        margin-top: 12px;
+    }
+
+    .metadata-label {
+        font-size: 0.70rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .metadata-value {
+        font-size: 0.85rem;
+        color: #334155;
+        font-weight: 650;
+    }
+
+    /* ---------- SIDEBAR ---------- */
+
+    [data-testid="stSidebar"] {
+        background: #ffffff;
+        border-right: 1px solid #e5e7eb;
+    }
+
+    .sidebar-brand {
+        font-size: 1.15rem;
+        font-weight: 750;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .sidebar-description {
+        color: #64748b;
+        font-size: 0.78rem;
+        line-height: 1.5;
+        margin-bottom: 18px;
+    }
+
+    .sidebar-section {
+        font-size: 0.72rem;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.7px;
+        font-weight: 750;
+        margin-top: 20px;
+        margin-bottom: 9px;
+    }
+
+    /* ---------- BUTTONS ---------- */
+
+    .stButton > button {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        color: #334155;
+        font-size: 0.82rem;
+        font-weight: 600;
+        padding: 9px 12px;
+        transition: all 0.15s ease;
+    }
+
+    .stButton > button:hover {
+        border-color: #93c5fd;
+        background: #eff6ff;
+        color: #1d4ed8;
+    }
+
+    /* ---------- CHAT INPUT ---------- */
 
     [data-testid="stChatInput"] {
         border-radius: 16px;
     }
 
-    [data-testid="stChatInput"] textarea {
-        border-radius: 14px !important;
-        border: 1px solid #d5dce6 !important;
-        background: white !important;
-    }
-
-    /* -------------------------------------------------------
-       METADATA BADGES
-    ------------------------------------------------------- */
-
-    .metadata-container {
-        display: flex;
-        gap: 8px;
-        margin-top: 10px;
-    }
-
-    .metadata-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 20px;
-        background: #f0f5fb;
-        color: #24568c;
-        font-size: 0.72rem;
-        font-weight: 600;
-        border: 1px solid #dbe7f3;
-    }
-
-    .sentiment-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 20px;
-        background: #fff7ed;
-        color: #c2410c;
-        font-size: 0.72rem;
-        font-weight: 600;
-        border: 1px solid #fed7aa;
-    }
-
-    /* -------------------------------------------------------
-       SECTION CARDS
-    ------------------------------------------------------- */
-
-    .section-card {
-        background: white;
-        border: 1px solid #e4e9f0;
-        border-radius: 18px;
-        padding: 24px;
-        margin-top: 25px;
-        box-shadow: 0 4px 18px rgba(11, 42, 82, 0.05);
-    }
-
-    .section-title {
-        color: #0b2a52;
-        font-size: 1.25rem;
-        font-weight: 700;
-    }
-
-    .section-description {
-        color: #667085;
-        font-size: 0.9rem;
-        line-height: 1.5;
-    }
-
-    /* -------------------------------------------------------
-       BUTTONS
-    ------------------------------------------------------- */
-
-    .stButton button {
-        border-radius: 10px;
-        font-weight: 600;
-        transition: all 0.2s ease;
-    }
-
-    .stButton button:hover {
-        transform: translateY(-1px);
-    }
-
-    /* -------------------------------------------------------
-       SUPPORT FORM
-    ------------------------------------------------------- */
-
-    [data-testid="stForm"] {
-        background: white;
-        padding: 22px;
-        border-radius: 16px;
-        border: 1px solid #e4e9f0;
-    }
-
-    /* -------------------------------------------------------
-       DIVIDER
-    ------------------------------------------------------- */
+    /* ---------- DIVIDERS ---------- */
 
     hr {
-        border-color: #e4e9f0 !important;
+        border-color: #e5e7eb;
     }
 
-    /* -------------------------------------------------------
-       FOOTER
-    ------------------------------------------------------- */
+    /* ---------- FOOTER ---------- */
 
     .footer {
         text-align: center;
-        color: #98a2b3;
-        font-size: 0.78rem;
-        margin-top: 40px;
-        padding-top: 20px;
+        color: #94a3b8;
+        font-size: 0.72rem;
+        margin-top: 35px;
+        padding-top: 15px;
     }
 
     </style>
     """,
     unsafe_allow_html=True,
 )
+# HELPER FUNCTIONS
+
+def clean_response(text: str) -> str:
+    """
+    Prevent raw HTML/XML-like fragments from appearing in
+    the user-facing response.
+    """
+
+    if not text:
+        return ""
+
+    text = str(text)
+
+    # Remove common HTML tags
+    text = re.sub(r"<\/?[a-zA-Z][^>]*>", "", text)
+
+    # Remove accidental HTML entities
+    text = html.unescape(text)
+
+    # Clean excessive whitespace
+    text = re.sub(r"\n{3,}", "\n\n", text)
+
+    return text.strip()
+
+
+def department_icon(department: str) -> str:
+    icons = {
+        "HR": "👥",
+        "IT Support": "💻",
+        "Billing & Payments": "💳",
+        "Shipping & Delivery": "📦",
+        "Unknown": "❔",
+    }
+
+    return icons.get(department, "🤖")
+
+
+def sentiment_icon(sentiment: str) -> str:
+    icons = {
+        "Positive": "😊",
+        "Neutral": "😐",
+        "Negative": "⚠️",
+    }
+
+    return icons.get(sentiment, "•")
+
+# SESSION STATE
+
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
 # SIDEBAR
 
 with st.sidebar:
 
-    # Logo
-    try:
-        st.image(
-            "assets/shopunow_logo.png",
-            width=210,
-        )
-    except Exception:
+    st.markdown(
+        """
+        <div class="sidebar-brand">🛍️ ShopUNow</div>
+        <div class="sidebar-description">
+            Your intelligent support assistant for everyday
+            ShopUNow questions.
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    if st.button(
+        "🗑️  Clear conversation",
+        use_container_width=True,
+    ):
+        st.session_state.messages = []
+        st.rerun()
+
+    st.markdown(
+        '<div class="sidebar-section">Try asking</div>',
+        unsafe_allow_html=True,
+    )
+
+    example_questions = [
+        "How do I reset my employee VPN password?",
+        "How do I apply for a vacation day?",
+        "What should I do if my laptop is running slow?",
+        "Where is my ShopUNow package?",
+    ]
+
+    for question in example_questions:
+        if st.button(
+            question,
+            key=f"example_{question}",
+            use_container_width=True,
+        ):
+            st.session_state.pending_question = question
+
+    st.markdown(
+        '<div class="sidebar-section">Supported areas</div>',
+        unsafe_allow_html=True,
+    )
+
+    departments = [
+        ("👥", "HR"),
+        ("💻", "IT Support"),
+        ("💳", "Billing & Payments"),
+        ("📦", "Shipping & Delivery"),
+    ]
+
+    for icon, department in departments:
         st.markdown(
-            """
+            f"""
             <div style="
-                font-size: 1.7rem;
-                font-weight: 750;
-                margin-bottom: 15px;
+                padding:7px 0;
+                color:#475569;
+                font-size:0.84rem;
             ">
-                🛍️ ShopUNow
+                {icon}&nbsp;&nbsp;{department}
             </div>
             """,
             unsafe_allow_html=True,
         )
 
     st.markdown(
-        """
-        <div style="
-            color:#b9c9dc;
-            font-size:0.85rem;
-            margin-bottom:20px;
-        ">
-            AI-powered support assistant
-        </div>
-        """,
+        '<div class="sidebar-section">AI capabilities</div>',
         unsafe_allow_html=True,
     )
 
-    st.markdown("### 💡 Try an Example")
-
-    if st.button(
-        "🗑️  Clear Chat",
-        use_container_width=True,
-    ):
-        st.session_state.messages = []
-
-        conversation_memory.clear(
-            st.session_state.session_id
-        )
-
-        st.session_state.escalation_pending = False
-        st.session_state.escalation_query = ""
-        st.session_state.escalation_confirmation = None
-
-        st.rerun()
-
-    st.markdown("")
-
-    example_questions = [
-        "How do I reset my ShopUNow employee VPN password?",
-        "How do I apply for a vacation day?",
-        "What should I do if my laptop is running slow?",
-        "I am extremely frustrated because my VPN has been broken for days!",
-    ]
-
-    for question in example_questions:
-        if st.button(
-            question,
-            use_container_width=True,
-        ):
-            st.session_state.pending_question = question
-
-    st.divider()
-
-    st.markdown("### 🏢 Departments")
-
-    departments = [
-        "👥 HR",
-        "💻 IT Support",
-        "💳 Billing & Payments",
-        "📦 Shipping & Delivery",
-    ]
-
-    for department in departments:
-        st.markdown(
-            f"""
-            <div style="
-                padding:7px 0;
-                color:#d7e3f0;
-                font-size:0.88rem;
-            ">
-                {department}
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
-
-    st.divider()
-
-    st.markdown("### 🤖 AI Capabilities")
-
     capabilities = [
-        "Department-aware routing",
-        "Knowledge-grounded answers",
-        "Sentiment detection",
-        "Conversational memory",
-        "Human escalation",
-        "Hallucination prevention",
+        "🎯 Department-aware routing",
+        "📚 Knowledge-grounded answers",
+        "🧠 Sentiment detection",
+        "🙋 Human escalation",
+        "🛡️ Hallucination prevention",
     ]
 
     for capability in capabilities:
@@ -406,10 +399,10 @@ with st.sidebar:
             f"""
             <div style="
                 padding:5px 0;
-                color:#c9d8e8;
-                font-size:0.82rem;
+                color:#64748b;
+                font-size:0.78rem;
             ">
-                ✓ {capability}
+                {capability}
             </div>
             """,
             unsafe_allow_html=True,
@@ -419,40 +412,41 @@ with st.sidebar:
 
 st.markdown(
     """
-    <div class="brand-header">
-        <div class="brand-title">
-            🛍️ ShopUNow AI Assistant
+    <div class="shop-header">
+        <div class="shop-logo">🛍️</div>
+        <div>
+            <div class="shop-title">ShopUNow AI Assistant</div>
+            <div class="shop-subtitle">
+                Intelligent support powered by Agentic AI + RAG
+            </div>
         </div>
+    </div>
 
-        <div class="brand-subtitle">
-            Intelligent support powered by Agentic AI, RAG & LangGraph
-        </div>
-
-        <div class="online-status">
-            ● AI Assistant Online
-        </div>
+    <div class="status-row">
+        <span class="status-dot"></span>
+        <span class="status-text">AI Assistant Online</span>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
 # WELCOME SCREEN
+
 if not st.session_state.messages:
 
     st.markdown(
         """
         <div class="welcome-card">
-
             <div class="welcome-title">
-                👋 Welcome to ShopUNow
+                How can I help you today?
             </div>
 
             <div class="welcome-text">
-                I'm your AI support assistant. Ask me a question and
-                I'll route it to the right department and provide a
-                knowledge-grounded answer.
+                Ask a question about HR, IT Support, Billing & Payments,
+                or Shipping & Delivery. ShopUNow routes your request to
+                the right area and provides answers grounded in its
+                support knowledge.
             </div>
-
         </div>
         """,
         unsafe_allow_html=True,
@@ -463,9 +457,15 @@ if not st.session_state.messages:
     with col1:
         st.markdown(
             """
-            <div class="capability">
-                <b>🎯 Smart Routing</b><br>
-                Automatically identifies the right department.
+            <div class="capability-card">
+                <div class="capability-icon">🎯</div>
+                <div class="capability-title">
+                    Smart Routing
+                </div>
+                <div class="capability-text">
+                    Understands your intent and routes your question
+                    to the appropriate support area.
+                </div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -474,9 +474,15 @@ if not st.session_state.messages:
     with col2:
         st.markdown(
             """
-            <div class="capability">
-                <b>🧠 Knowledge Grounded</b><br>
-                Answers are based on the ShopUNow knowledge base.
+            <div class="capability-card">
+                <div class="capability-icon">📚</div>
+                <div class="capability-title">
+                    Grounded Answers
+                </div>
+                <div class="capability-text">
+                    Answers are generated from ShopUNow's trusted
+                    knowledge base.
+                </div>
             </div>
             """,
             unsafe_allow_html=True,
@@ -485,26 +491,31 @@ if not st.session_state.messages:
     with col3:
         st.markdown(
             """
-            <div class="capability">
-                <b>👤 Human Support</b><br>
-                Escalates conversations when human help is needed.
+            <div class="capability-card">
+                <div class="capability-icon">🙋</div>
+                <div class="capability-title">
+                    Human Escalation
+                </div>
+                <div class="capability-text">
+                    Frustrated or sensitive requests can be routed
+                    toward human support.
+                </div>
             </div>
             """,
             unsafe_allow_html=True,
         )
 
-    st.markdown("")
+    st.markdown("<br>", unsafe_allow_html=True)
 
-# DISPLAY PREVIOUS MESSAGES
+# DISPLAY EXISTING MESSAGES
 
 for message in st.session_state.messages:
 
-    with st.chat_message(
-        message["role"],
-        avatar="🤖" if message["role"] == "assistant" else "👤",
-    ):
+    with st.chat_message(message["role"]):
 
-        st.write(message["content"])
+        st.markdown(
+            clean_response(message["content"])
+        )
 
         if (
             message["role"] == "assistant"
@@ -513,33 +524,52 @@ for message in st.session_state.messages:
 
             department = message["metadata"].get(
                 "department",
-                "Unknown",
+                "Unknown"
             )
 
             sentiment = message["metadata"].get(
                 "sentiment",
-                "Unknown",
+                "Neutral"
             )
 
-            st.markdown(
-                f"""
-                <div class="metadata-container">
-                    <span class="metadata-badge">
-                        🏢 {department}
-                    </span>
+            col1, col2 = st.columns(2)
 
-                    <span class="sentiment-badge">
-                        💬 {sentiment}
-                    </span>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
+            with col1:
+                st.markdown(
+                    f"""
+                    <div class="metadata-card">
+                        <div class="metadata-label">
+                            Department
+                        </div>
+                        <div class="metadata-value">
+                            {department_icon(department)}
+                            &nbsp; {department}
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+            with col2:
+                st.markdown(
+                    f"""
+                    <div class="metadata-card">
+                        <div class="metadata-label">
+                            Sentiment
+                        </div>
+                        <div class="metadata-value">
+                            {sentiment_icon(sentiment)}
+                            &nbsp; {sentiment}
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
 # USER INPUT
 
 query = st.chat_input(
-    "Ask your ShopUNow question..."
+    "Ask ShopUNow anything about support..."
 )
 
 if "pending_question" in st.session_state:
@@ -549,256 +579,125 @@ if "pending_question" in st.session_state:
     )
 
 # PROCESS QUERY
+
+
 if query:
 
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": query,
-        }
-    )
+    query = query.strip()
 
-    with st.chat_message(
-        "user",
-        avatar="👤",
-    ):
-        st.write(query)
+    if query:
 
-    try:
-
-        with st.chat_message(
-            "assistant",
-            avatar="🤖",
-        ):
-
-            with st.spinner(
-                "ShopUNow AI is analyzing your question..."
-            ):
-
-                result = run_agent(
-                    query=query,
-                    session_id=st.session_state.session_id,
-                )
-
-            st.write(
-                result["response"]
-            )
-
-            department = result.get(
-                "department",
-                "Unknown",
-            )
-
-            sentiment = result.get(
-                "sentiment",
-                "Unknown",
-            )
-
-            st.markdown(
-                f"""
-                <div class="metadata-container">
-                    <span class="metadata-badge">
-                        🏢 {department}
-                    </span>
-
-                    <span class="sentiment-badge">
-                        💬 {sentiment}
-                    </span>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
+        # Save user message
+       
         st.session_state.messages.append(
             {
-                "role": "assistant",
-                "content": result["response"],
-                "metadata": {
-                    "department": department,
-                    "sentiment": sentiment,
-                },
+                "role": "user",
+                "content": query,
             }
         )
 
-        # Human escalation detected
-        if result.get(
-            "needs_escalation",
-            False,
-        ):
+        with st.chat_message("user"):
+            st.markdown(query)
+            
+        # Generate response
 
-            st.session_state.escalation_pending = True
-            st.session_state.escalation_query = query
+        try:
 
-    except Exception as e:
+            with st.chat_message("assistant"):
 
-        st.error(
-            f"Something went wrong: {e}"
-        )
+                with st.spinner(
+                    "ShopUNow AI is thinking..."
+                ):
 
-# HUMAN SUPPORT FORM
+                    result = graph_app.invoke(
+                        {
+                            "query": query
+                        }
+                    )
 
-if (
-    st.session_state.escalation_pending
-    and not st.session_state.escalation_confirmation
-):
-
-    st.markdown(
-        """
-        <div class="section-card">
-
-            <div class="section-title">
-                📞 Connect with Human Support
-            </div>
-
-            <div class="section-description">
-                It looks like this conversation would benefit from
-                human assistance. Please provide your contact
-                information and a ShopUNow support representative
-                will follow up with you.
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown("")
-
-    with st.form(
-        "human_support_form"
-    ):
-
-        name = st.text_input(
-            "Full Name",
-            placeholder="Enter your full name",
-        )
-
-        phone = st.text_input(
-            "Phone Number",
-            placeholder="Enter your phone number",
-        )
-
-        email = st.text_input(
-            "Email Address",
-            placeholder="Enter your email address",
-        )
-
-        submitted = st.form_submit_button(
-            "Submit Support Request",
-            use_container_width=True,
-        )
-
-        if submitted:
-
-            if not name.strip():
-
-                st.error(
-                    "Please enter your name."
+                response = clean_response(
+                    result.get(
+                        "response",
+                        "I'm sorry, I couldn't process that request."
+                    )
                 )
 
-            elif not phone.strip():
-
-                st.error(
-                    "Please enter your phone number."
+                department = result.get(
+                    "department",
+                    "Unknown"
                 )
 
-            elif not email.strip():
-
-                st.error(
-                    "Please enter your email address."
+                sentiment = result.get(
+                    "sentiment",
+                    "Neutral"
                 )
 
-            elif "@" not in email:
+                # Display response
+        
 
-                st.error(
-                    "Please enter a valid email address."
+                st.markdown(response)
+
+                col1, col2 = st.columns(2)
+
+                with col1:
+                    st.markdown(
+                        f"""
+                        <div class="metadata-card">
+                            <div class="metadata-label">
+                                Department
+                            </div>
+                            <div class="metadata-value">
+                                {department_icon(department)}
+                                &nbsp; {department}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                with col2:
+                    st.markdown(
+                        f"""
+                        <div class="metadata-card">
+                            <div class="metadata-label">
+                                Sentiment
+                            </div>
+                            <div class="metadata-value">
+                                {sentiment_icon(sentiment)}
+                                &nbsp; {sentiment}
+                            </div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                # Save assistant message
+            
+                st.session_state.messages.append(
+                    {
+                        "role": "assistant",
+                        "content": response,
+                        "metadata": {
+                            "department": department,
+                            "sentiment": sentiment,
+                        },
+                    }
                 )
 
-            else:
+        except Exception:
 
-                st.session_state.escalation_confirmation = {
-                    "name": name.strip(),
-                    "phone": phone.strip(),
-                    "email": email.strip(),
-                }
-
-                st.session_state.escalation_pending = False
-
-                st.rerun()
-
-# ESCALATION CONFIRMATION
-
-if st.session_state.escalation_confirmation:
-
-    contact = (
-        st.session_state.escalation_confirmation
-    )
-
-    st.markdown(
-        """
-        <div class="section-card">
-
-            <div class="section-title">
-                ✅ Support Request Received
-            </div>
-
-            <div class="section-description">
-                Your information has been successfully submitted.
-                A ShopUNow support representative will reach out
-                to you soon.
-            </div>
-
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.markdown("")
-
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        st.metric(
-            "Name",
-            contact["name"],
-        )
-
-    with col2:
-        st.metric(
-            "Phone",
-            contact["phone"],
-        )
-
-    with col3:
-        st.metric(
-            "Email",
-            contact["email"],
-        )
-
-    st.info(
-        "Thank you! A ShopUNow support representative "
-        "will reach out to you soon."
-    )
-
-    if st.button(
-        "Start New Support Request",
-        use_container_width=True,
-    ):
-
-        st.session_state.escalation_confirmation = None
-        st.session_state.escalation_query = ""
-
-        st.rerun()
+            st.error(
+                "I'm sorry, something went wrong while "
+                "processing your request. Please try again."
+            )
 
 # FOOTER
 
 st.markdown(
     """
     <div class="footer">
-        ShopUNow AI Assistant &nbsp;•&nbsp;
-        Agentic AI &nbsp;•&nbsp;
-        RAG &nbsp;•&nbsp;
-        LangGraph
+        ShopUNow AI Assistant · Agentic RAG ·
+        Department-aware support
     </div>
     """,
     unsafe_allow_html=True,
