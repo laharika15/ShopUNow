@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from agent import graph_app
+from agent import run_agent
 
 app = FastAPI(
     title="ShopUNow Agentic AI Assistant",
@@ -10,6 +10,7 @@ app = FastAPI(
 
 class QueryRequest(BaseModel):
     query: str
+    session_id: str = "default"
 
 class QueryResponse(BaseModel):
     response: str
@@ -18,11 +19,11 @@ class QueryResponse(BaseModel):
 
 @app.post("/query", response_model=QueryResponse)
 async def query_assistant(request: QueryRequest):
-    # Initialize state
-    state = {"query": request.query}
-    
-    # Run the graph
-    result = graph_app.invoke(state)
+ 
+   result = run_agent(
+        query=request.query,
+        session_id=request.session_id
+    )
     
     return QueryResponse(
         response=result.get("response", "Error processing request."),
