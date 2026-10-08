@@ -58,17 +58,12 @@ st.markdown(
     <style>
 
     /* ========================================================
-       GLOBAL APP BACKGROUND
+       APP BACKGROUND
        ======================================================== */
 
     .stApp {
         background-color: #F4F6F9;
     }
-
-
-    /* ========================================================
-       MAIN CONTENT AREA
-       ======================================================== */
 
     .main .block-container {
         max-width: 1000px;
@@ -78,22 +73,40 @@ st.markdown(
 
 
     /* ========================================================
-       MAIN CONTENT TEXT
-       Force dark text so it remains visible on light background
+       MAIN PAGE MARKDOWN
+       Only target actual markdown/text elements.
+       Do NOT force color on every div/span.
        ======================================================== */
 
-    .main .block-container,
-    .main .block-container p,
-    .main .block-container span,
-    .main .block-container label,
-    .main .block-container div,
-    .main .block-container h1,
-    .main .block-container h2,
-    .main .block-container h3,
-    .main .block-container h4,
-    .main .block-container h5,
-    .main .block-container h6 {
-        color: #1E293B;
+    .main .block-container .stMarkdown p,
+    .main .block-container .stMarkdown h1,
+    .main .block-container .stMarkdown h2,
+    .main .block-container .stMarkdown h3,
+    .main .block-container .stMarkdown h4,
+    .main .block-container .stMarkdown h5,
+    .main .block-container .stMarkdown h6 {
+        color: #1E293B !important;
+    }
+
+
+    /* ========================================================
+       CHAT MESSAGE TEXT
+       ======================================================== */
+
+    [data-testid="stChatMessage"] .stMarkdown p,
+    [data-testid="stChatMessage"] .stMarkdown li,
+    [data-testid="stChatMessage"] .stMarkdown strong,
+    [data-testid="stChatMessage"] .stMarkdown em {
+        color: #1E293B !important;
+    }
+
+
+    /* ========================================================
+       CHAT INPUT
+       ======================================================== */
+
+    [data-testid="stChatInput"] {
+        border-radius: 12px;
     }
 
 
@@ -108,10 +121,8 @@ st.markdown(
 
     /* ========================================================
        SIDEBAR TEXT
-       Keep sidebar text white
        ======================================================== */
 
-    [data-testid="stSidebar"],
     [data-testid="stSidebar"] h1,
     [data-testid="stSidebar"] h2,
     [data-testid="stSidebar"] h3,
@@ -119,10 +130,7 @@ st.markdown(
     [data-testid="stSidebar"] h5,
     [data-testid="stSidebar"] h6,
     [data-testid="stSidebar"] p,
-    [data-testid="stSidebar"] span,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] caption,
-    [data-testid="stSidebar"] .stMarkdown p {
+    [data-testid="stSidebar"] .stMarkdown {
         color: #FFFFFF !important;
     }
 
@@ -138,35 +146,13 @@ st.markdown(
         font-weight: 500 !important;
     }
 
-
-    [data-testid="stSidebar"] .stButton button p,
-    [data-testid="stSidebar"] .stButton button span {
+    [data-testid="stSidebar"] .stButton button p {
         color: #FFFFFF !important;
     }
 
-
     [data-testid="stSidebar"] .stButton button:hover {
         background-color: rgba(255, 255, 255, 0.18) !important;
-        border: 1px solid #10B981 !important;
-    }
-
-
-    /* ========================================================
-       CHAT MESSAGE TEXT
-       ======================================================== */
-
-    [data-testid="stChatMessage"] p,
-    [data-testid="stChatMessage"] span {
-        color: #1E293B !important;
-    }
-
-
-    /* ========================================================
-       CHAT INPUT
-       ======================================================== */
-
-    [data-testid="stChatInput"] {
-        border-radius: 12px;
+        border-color: #10B981 !important;
     }
 
     </style>
