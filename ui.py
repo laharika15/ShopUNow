@@ -389,12 +389,6 @@ for message in st.session_state.messages:
             )
 
 
-            hist_cols[2].caption(
-                f"🎯 **Scope:** "
-                f"{meta.get('scope', 'In-Scope')}"
-            )
-
-
 # ============================================================
 # CHAT INPUT
 # ============================================================
@@ -470,7 +464,6 @@ if final_prompt:
             # ------------------------------------------------
             department_meta = "General"
             sentiment_meta = "Neutral"
-            scope_meta = "In-Scope"
 
             clean_output = ""
 
@@ -522,13 +515,6 @@ if final_prompt:
                     "sentiment",
                     "Neutral",
                 )
-
-
-                scope_meta = response_data.get(
-                    "scope",
-                    "In-Scope",
-                )
-
 
             # =================================================
             # PLAIN TEXT FALLBACK
@@ -594,12 +580,6 @@ if final_prompt:
                 f"🎭 Sentiment: {sentiment_meta}"
             )
 
-
-            live_cols[2].caption(
-                f"🎯 Scope: {scope_meta}"
-            )
-
-
             # =================================================
             # SAVE ASSISTANT RESPONSE
             # =================================================
@@ -610,11 +590,9 @@ if final_prompt:
                     "metadata": {
                         "department": department_meta,
                         "sentiment": sentiment_meta,
-                        "scope": scope_meta,
                     },
                 }
             )
-
 
     # ========================================================
     # REFRESH UI
