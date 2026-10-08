@@ -1,6 +1,8 @@
 import streamlit as st
+import uuid
 from database import initialize_database
 from agent import graph_app
+from memory import conversation_memory
 
 initialize_database()
 
@@ -18,16 +20,47 @@ st.set_page_config(
 # -----------------------------
 st.markdown("""
 <style>
+    /* Google Fonts */
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+    
+    html, body, [class*="css"] {
+        font-family: 'Outfit', sans-serif;
+    }
+
     .main-title {
-        font-size: 2.2rem;
+        font-size: 2.8rem;
         font-weight: 700;
+        background: -webkit-linear-gradient(45deg, #1E3A8A, #3B82F6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
         margin-bottom: 0.2rem;
+        margin-top: 10px;
     }
 
     .subtitle {
-        color: #666;
-        font-size: 1rem;
+        color: #64748B;
+        font-size: 1.1rem;
+        font-weight: 400;
+        margin-top: 5px;
         margin-bottom: 1.5rem;
+    }
+    
+    /* Modern Button Styling */
+    div.stButton > button:first-child {
+        border-radius: 12px;
+        border: none;
+        background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+        color: white;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    div.stButton > button:first-child:hover {
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        transform: translateY(-2px);
+        color: white;
+        border: none;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -35,17 +68,25 @@ st.markdown("""
 # -----------------------------
 # Header
 # -----------------------------
-st.markdown(
-    '<div class="main-title">🛍️ ShopUNow AI Assistant</div>',
-    unsafe_allow_html=True
-)
+col1, col2 = st.columns([1, 4])
+with col1:
+    import os
+    if os.path.exists("assets/logo.png"):
+        st.image("assets/logo.png", width=120)
+    else:
+        st.markdown("<h1>🛍️</h1>", unsafe_allow_html=True)
 
-st.markdown(
-    '<div class="subtitle">'
-    'Intelligent support powered by Agentic AI, RAG, and LangGraph'
-    '</div>',
-    unsafe_allow_html=True
-)
+with col2:
+    st.markdown(
+        '<div class="main-title">ShopUNow Assistant</div>',
+        unsafe_allow_html=True
+    )
+    st.markdown(
+        '<div class="subtitle">'
+        'Intelligent enterprise support powered by Agentic AI, RAG, and LangGraph'
+        '</div>',
+        unsafe_allow_html=True
+    )
 
 st.divider()
 
@@ -54,6 +95,8 @@ st.divider()
 # -----------------------------
 if "messages" not in st.session_state:
     st.session_state.messages = []
+if "session_id" not in st.session_state:
+    st.session_state.session_id = str(uuid.uuid4())
 if "escalation_pending" not in st.session_state:
     st.session_state.escalation_pending = False
 
@@ -70,6 +113,7 @@ with st.sidebar:
 
     if st.button("🗑️ Clear Chat", use_container_width=True):
         st.session_state.messages = []
+        conversation_memory.clear(st.session_state.session_id)
         st.rerun()
 
     example_questions = [
@@ -149,7 +193,8 @@ if query:
                 "🤖 ShopUNow AI is analyzing your question..."
             ):
                 result = graph_app.invoke({
-                    "query": query
+                    "query": query,
+                    "session_id": st.session_state.session_id
                 })
 
             st.write(result["response"])
@@ -174,6 +219,8 @@ if query:
                     "sentiment": result["sentiment"]
                 }
             })
+            
+            conversation_memory.add_turn(st.session_state.session_id, query, result["response"])
 
             # -----------------------------
             # Human escalation detected

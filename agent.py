@@ -1,7 +1,8 @@
 import json
 from typing import TypedDict
 
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
+from memory import conversation_memory
 from langchain_groq import ChatGroq
 from langgraph.graph import StateGraph, START, END
 
@@ -21,6 +22,7 @@ from retrieval import (
 
 class GraphState(TypedDict, total=False):
     query: str
+    session_id: str
     sentiment: str
     department: str
     scope: str
@@ -148,14 +150,37 @@ HR includes:
 
 IT Support includes:
 
+- work laptop
+- laptop
+- computer
+- Windows
+- macOS
+- Windows update
+- software
 - password
 - login
 - credentials
 - VPN
-- computer
-- software
+- Wi-Fi
 - account access
 - technical problems
+- hardware problems
+- slow computer
+- slow laptop
+- system updates
+Examples:
+
+"My work laptop is running slow."
+=> IT Support
+
+"What should I do if my laptop is running slow after the latest Windows update?"
+=> IT Support
+
+"My Windows computer is having problems."
+=> IT Support
+
+"My VPN is not working."
+=> IT Support
 
 Billing & Payments includes:
 
@@ -237,10 +262,16 @@ Return ONLY valid JSON.
 
     try:
 
-        response = llm.invoke([
-            SystemMessage(content=prompt),
-            HumanMessage(content=state["query"])
-        ])
+        session_id = state.get("session_id", "default")
+        history = conversation_memory.get_history(session_id)
+        
+        messages = [SystemMessage(content=prompt)]
+        for turn in history:
+            messages.append(HumanMessage(content=turn["user"]))
+            messages.append(AIMessage(content=turn["assistant"]))
+        messages.append(HumanMessage(content=state["query"]))
+
+        response = llm.invoke(messages)
 
         result = json.loads(response.content)
 
@@ -413,10 +444,14 @@ knowledge base to answer this accurately.
     discussing how the system works.
 """
 
-    messages = [
-        SystemMessage(content=system_prompt),
-        HumanMessage(content=state["query"])
-    ]
+    session_id = state.get("session_id", "default")
+    history = conversation_memory.get_history(session_id)
+
+    messages = [SystemMessage(content=system_prompt)]
+    for turn in history:
+        messages.append(HumanMessage(content=turn["user"]))
+        messages.append(AIMessage(content=turn["assistant"]))
+    messages.append(HumanMessage(content=state["query"]))
 
     try:
 

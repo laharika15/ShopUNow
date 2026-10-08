@@ -17,11 +17,12 @@ The project was built with a strong focus on:
 
 - Grounded RAG
 - Hallucination prevention
-- Conversational query handling
+- Conversational query handling with multi-user session memory
 - Department-aware retrieval
-- Human escalation
+- Human escalation with interactive forms
 - Controlled abstention
 - Free-tier / quota-efficient development
+- Modernized, branded Streamlit UI
 
 ## Live Demo
 
@@ -80,7 +81,7 @@ The system uses a graph-based workflow powered by LangGraph:
    - *RAG*: Otherwise, it routes to the Department-Aware RAG workflow.
 3. **Department-Aware Retrieval**: Queries a local ChromaDB instance using local Hugging Face embeddings (`sentence-transformers/all-MiniLM-L6-v2`). The categorized department is applied as a metadata filter to prevent cross-department retrieval and knowledge leakage.
 4. **Relevance Threshold & Controlled Abstention**: If retrieved documents do not meet the configured relevance threshold, the system skips LLM generation and returns a controlled abstention response to reduce hallucinations.
-5. **Grounded Generation**: If relevant context is found, it uses Groq to generate a final answer *strictly* grounded in the retrieved documents.
+5. **Grounded Generation**: If relevant context is found, it uses Groq to generate a final answer *strictly* grounded in the retrieved documents. Conversational history is injected into the prompt, allowing for stateful multi-turn interactions.
 6. **Reflection (Optional)**: Can be toggled on to re-verify the output against the context.
 
 ## Local Setup & Installation
