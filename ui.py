@@ -143,7 +143,7 @@ st.markdown(
         padding: 4px 8px;
         border-radius: 4px;
         display: inline-block;
-        margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
     }
 
     </style>
@@ -303,19 +303,17 @@ with st.sidebar:
 
 
 # ============================================================
-# MAIN INTERFACE
+# MAIN INTERFACE RENDERER
 # ============================================================
 
-# ------------------------------------------------------------
-# CONDITIONAL WELCOME BANNER
-# ------------------------------------------------------------
-# Only display the welcome screen when there are no messages.
-# ------------------------------------------------------------
+# Conditional Welcome Banner Header
+# Disappears automatically when chat history is populated.
 if not st.session_state.messages:
 
     st.markdown(
         """
         <div class="header-container">
+
             <div class="top-header-title">
                 ShopUNow AI Assistant
             </div>
@@ -327,20 +325,20 @@ if not st.session_state.messages:
             <div class="online-status">
                 ● AI Assistant Online
             </div>
+
+            <div class="welcome-status">
+                ● READY TO HELP
+            </div>
+
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    st.markdown(
-        '<div class="welcome-status">● READY TO HELP</div>',
-        unsafe_allow_html=True,
-    )
 
-
-# ------------------------------------------------------------
-# RENDER HISTORICAL CHAT LOG
-# ------------------------------------------------------------
+# ============================================================
+# RENDER HISTORICAL CHAT LOG THREAD
+# ============================================================
 for message in st.session_state.messages:
 
     current_avatar = (
@@ -357,7 +355,7 @@ for message in st.session_state.messages:
         st.write(message["content"])
 
         # ----------------------------------------------------
-        # HISTORICAL ASSISTANT METADATA
+        # DISPLAY HISTORICAL ASSISTANT METADATA
         # ----------------------------------------------------
         if (
             message["role"] == "assistant"
@@ -394,16 +392,15 @@ user_input = st.chat_input(
 final_prompt = None
 
 
-# ------------------------------------------------------------
-# SIDEBAR PROMPT HAS PRIORITY
-# ------------------------------------------------------------
+# ============================================================
+# PROCESS SIDEBAR PROMPT OR CHAT INPUT
+# ============================================================
 if st.session_state.active_prompt:
 
     final_prompt = st.session_state.active_prompt
 
-    # Consume the prompt so it is not submitted repeatedly.
+    # Consume prompt so it is executed only once.
     st.session_state.active_prompt = None
-
 
 elif user_input:
 
@@ -424,7 +421,7 @@ if final_prompt:
     ):
         st.write(final_prompt)
 
-    # Save user message immediately.
+    # Save user message to session history.
     st.session_state.messages.append(
         {
             "role": "user",
@@ -443,7 +440,7 @@ if final_prompt:
 
         with st.spinner("Processing request..."):
 
-            # Default metadata values
+            # Default metadata
             department_meta = "General"
             sentiment_meta = "Neutral"
             scope_meta = "In-Scope"
@@ -451,7 +448,7 @@ if final_prompt:
 
 
             # =================================================
-            # CALL AGENT
+            # CALL BACKEND AGENT
             # =================================================
             try:
 
@@ -462,7 +459,7 @@ if final_prompt:
 
 
                 # =================================================
-                # PARSE AGENT RESPONSE
+                # PARSE RESPONSE
                 # =================================================
                 if isinstance(raw_response, dict):
 
@@ -476,25 +473,22 @@ if final_prompt:
 
 
                 # =================================================
-                # EXTRACT RESPONSE
+                # EXTRACT RESPONSE CONTENT
                 # =================================================
                 clean_output = response_data.get(
                     "response",
                     "Could not fetch message contents.",
                 )
 
-
                 department_meta = response_data.get(
                     "department",
                     "General",
                 )
 
-
                 sentiment_meta = response_data.get(
                     "sentiment",
                     "Neutral",
                 )
-
 
                 scope_meta = response_data.get(
                     "scope",
@@ -503,7 +497,7 @@ if final_prompt:
 
 
             # =================================================
-            # FALLBACK FOR PLAIN TEXT RESPONSE
+            # FALLBACK FOR PLAIN-TEXT RESPONSE
             # =================================================
             except (
                 json.JSONDecodeError,
@@ -525,9 +519,10 @@ if final_prompt:
 
 
             # =================================================
-            # SAFETY: ENSURE OUTPUT IS STRING
+            # ENSURE OUTPUT IS ALWAYS A STRING
             # =================================================
             if clean_output is None:
+
                 clean_output = (
                     "I could not generate a response."
                 )
@@ -562,7 +557,7 @@ if final_prompt:
 
 
             # =================================================
-            # SAVE ASSISTANT MESSAGE TO SESSION STATE
+            # SAVE ASSISTANT RESPONSE TO SESSION STATE
             # =================================================
             st.session_state.messages.append(
                 {
