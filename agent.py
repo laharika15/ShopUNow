@@ -771,16 +771,55 @@ def run_agent(
     session_id: str = "default"
 ) -> dict:
     """
-    Run the ShopUNow agent using session-specific
-    conversational memory.
-
-    Each session_id gets its own conversation history,
-    allowing multiple users to interact independently.
+    Run ShopUNow with session-specific conversation memory.
+    Handles direct conversation-recall questions before routing.
     """
 
-    history = conversation_memory.get_history(
-        session_id
-    )
+    history = conversation_memory.get_history(session_id)
+    normalized_query = query.lower().strip().rstrip("?!.")
+
+    recall_phrases = {
+        "what is my previous ask",
+        "what was my previous ask",
+        "what did i ask previously",
+        "what was my last question",
+        "what did i ask before",
+        "what was my previous question",
+        "what did i just ask",
+        "what was my last ask",
+    }
+
+    if normalized_query in recall_phrases:
+        if history:
+            previous_question = history[-1]["user"]
+
+            response = (
+                f"Your previous question was: "
+                f'"{previous_question}"'
+            )
+            department = "Conversation History"
+        else:
+            response = (
+                "There are no previous questions in "
+                "this conversation yet."
+            )
+            department = "Conversation History"
+
+        conversation_memory.add_turn(
+            session_id,
+            query,
+            response
+        )
+
+        return {
+            "query": query,
+            "response": response,
+            "department": department,
+            "sentiment": "Neutral",
+            "scope": "In-Scope",
+            "standalone_query": query,
+            "needs_escalation": False,
+        }
 
     state = {
         "query": query,
