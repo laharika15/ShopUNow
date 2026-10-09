@@ -37,6 +37,16 @@ if "messages" not in st.session_state:
 if "active_prompt" not in st.session_state:
     st.session_state.active_prompt = None
 
+# Added for human escalation form only
+if "show_escalation_form" not in st.session_state:
+    st.session_state.show_escalation_form = False
+
+if "escalation_submitted" not in st.session_state:
+    st.session_state.escalation_submitted = False
+
+if "escalation_contact" not in st.session_state:
+    st.session_state.escalation_contact = None
+
 
 # ============================================================
 # AVATAR DEFINITIONS
@@ -573,6 +583,31 @@ if final_prompt:
 
 
             # =================================================
+            # HUMAN ESCALATION DETECTION (ADDED)
+            # =================================================
+            response_lower = clean_output.lower()
+
+            escalation_phrases = (
+                "human support",
+                "human agent",
+                "support representative",
+                "contact the it service desk",
+                "please provide your contact details",
+                "contact details below",
+            )
+
+            st.session_state.show_escalation_form = any(
+                phrase in response_lower
+                for phrase in escalation_phrases
+            )
+
+            # Reset submission state for a newly triggered form
+            if st.session_state.show_escalation_form:
+                st.session_state.escalation_submitted = False
+                st.session_state.escalation_contact = None
+
+
+            # =================================================
             # STREAM RESPONSE
             # =================================================
             st.write_stream(
@@ -615,3 +650,80 @@ if final_prompt:
     # REFRESH UI
     # ========================================================
     st.rerun()
+
+
+# ============================================================
+# HUMAN ESCALATION FORM (ADDED)
+# ============================================================
+if st.session_state.show_escalation_form:
+
+    st.write("---")
+    st.subheader("📞 Contact Human Support")
+
+    st.write(
+        "Please provide your contact details so our support "
+        "team can follow up with you."
+    )
+
+    if not st.session_state.escalation_submitted:
+
+        with st.form("human_escalation_form"):
+
+            full_name = st.text_input(
+                "Full Name",
+                placeholder="Enter your full name",
+            )
+
+            email = st.text_input(
+                "Email Address",
+                placeholder="Enter your email address",
+            )
+
+            phone = st.text_input(
+                "Phone Number",
+                placeholder="Enter your phone number",
+            )
+
+            submitted = st.form_submit_button(
+                "Submit Contact Details",
+                use_container_width=True,
+            )
+
+            if submitted:
+
+                if not full_name.strip():
+                    st.error("Please enter your full name.")
+
+                elif (
+                    not email.strip()
+                    or "@" not in email
+                    or "." not in email.split("@")[-1]
+                ):
+                    st.error("Please enter a valid email address.")
+
+                elif not phone.strip():
+                    st.error("Please enter your phone number.")
+
+                else:
+                    st.session_state.escalation_contact = {
+                        "full_name": full_name.strip(),
+                        "email": email.strip(),
+                        "phone": phone.strip(),
+                    }
+
+                    st.session_state.escalation_submitted = True
+                    st.rerun()
+
+    else:
+
+        contact = st.session_state.escalation_contact
+
+        st.success(
+            "Your contact information has been received. "
+            "Someone from the support team can follow up with you."
+        )
+
+        st.write("**Submitted Contact Details**")
+        st.write(f"**Name:** {contact['full_name']}")
+        st.write(f"**Email:** {contact['email']}")
+        st.write(f"**Phone:** {contact['phone']}")
