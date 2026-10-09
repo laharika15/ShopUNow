@@ -268,59 +268,15 @@ with st.sidebar:
 
     st.write("---")
 
-
-    # ========================================================
-    # DEPARTMENTS
-    # ========================================================
+# ========================================================
+# DEPARTMENTS
+# ========================================================
     st.subheader("DEPARTMENTS")
 
-
-    if st.button(
-        "👥 HR Department",
-        use_container_width=True,
-    ):
-
-        st.session_state.active_prompt = (
-            "I need assistance from the HR department regarding company policy."
-        )
-
-        st.rerun()
-
-
-    if st.button(
-        "💻 IT Support",
-        use_container_width=True,
-    ):
-
-        st.session_state.active_prompt = (
-            "I need to open an IT technical support request."
-        )
-
-        st.rerun()
-
-
-    if st.button(
-        "💳 Billing & Payments",
-        use_container_width=True,
-    ):
-
-        st.session_state.active_prompt = (
-            "I have a question about vendor billing or employee payments."
-        )
-
-        st.rerun()
-
-
-    if st.button(
-        "📦 Shipping & Delivery",
-        use_container_width=True,
-    ):
-
-        st.session_state.active_prompt = (
-            "Show me the tracking options or shipping department procedures."
-        )
-
-        st.rerun()
+    st.markdown("👥 HR Department")
+    st.markdown("💻 IT Support")
+    st.markdown("💳 Billing & Payments")
+    st.markdown("📦 Shipping & Delivery")
 
 
 # ============================================================
