@@ -51,11 +51,11 @@ if "escalation_contact" not in st.session_state:
 # ============================================================
 # AVATAR DEFINITIONS
 # ============================================================
-USER_AVATAR = "👤"
+USER_AVATAR = "👩🏻‍💻"
 
 try:
     with open("assets/shopunow_logo.png", "rb") as f:
-        BOT_AVATAR = "assets/shopunow_logo.png"
+        BOT_AVATAR = f.read()
 except FileNotFoundError:
     BOT_AVATAR = "🛍️"
 
