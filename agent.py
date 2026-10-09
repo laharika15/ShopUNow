@@ -265,13 +265,30 @@ identified. If the query is ambiguous, prefer In-Scope plus
 Unknown so the assistant can ask a clarifying question rather
 than wrongly rejecting it.
 
+
 SENTIMENT GUIDANCE
 
-Normal information-seeking questions are Neutral, even if they
-describe a problem. Negative means genuine dissatisfaction,
-anger, frustration, or a complaint directed at the service.
-Do not classify a query as Negative merely because something
-is broken, delayed, or not working.
+Classify the user's emotional tone, not the severity of the
+problem being described.
+
+Use Neutral for ordinary technical problems, questions, or
+requests for help, even when the user says something is broken,
+slow, unavailable, or not working.
+
+Examples:
+- "My system is too slow." -> Neutral
+- "My laptop keeps freezing." -> Neutral
+- "I can't log in." -> Neutral
+- "My internet is not working." -> Neutral
+- "My order hasn't arrived." -> Neutral
+- "Why was I charged twice?" -> Neutral unless the user clearly
+  expresses anger, frustration, or dissatisfaction.
+- "I'm furious that my system is still slow after three weeks
+  and nobody has fixed it!" -> Negative
+
+Use Negative only when the user clearly expresses frustration,
+anger, dissatisfaction, or a complaint. Do not infer negative
+sentiment merely from the existence of a problem.
 
 STANDALONE QUERY
 
