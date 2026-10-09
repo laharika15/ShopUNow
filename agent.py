@@ -674,6 +674,10 @@ def run_agent(query: str, session_id: str = "default") -> dict:
         "what was my previous question",
         "what did i just ask",
         "what was my last ask",
+        "what did i ask you",
+        "what did i ask you last",
+        "what did i ask",
+        "what was my last message",
     }
 
     if normalized_query in recall_phrases:
