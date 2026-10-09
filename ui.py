@@ -1,6 +1,5 @@
 import uuid
 import json
-import time
 import streamlit as st
 
 from database import initialize_database
@@ -170,23 +169,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
-# ============================================================
-# HELPER FUNCTION
-# ============================================================
-def text_streamer(text_block: str):
-    """
-    Simulates a natural word-by-word response stream.
-    """
-
-    if not text_block:
-        return
-
-    for word in str(text_block).split():
-        yield word + " "
-        time.sleep(0.04)
-
-
 # ============================================================
 # SIDEBAR NAVIGATION & QUICK ACTIONS
 # ============================================================
@@ -213,18 +195,19 @@ with st.sidebar:
     # QUICK ACTIONS
     # ========================================================
     st.subheader("QUICK ACTIONS")
-
-
+    
     if st.button(
         "🔄 Clear Conversation",
         use_container_width=True,
     ):
-
+        conversation_memory.clear(st.session_state.session_id)
         st.session_state.messages = []
         st.session_state.active_prompt = None
+        st.session_state.show_escalation_form = False
+        st.session_state.escalation_submitted = False
+        st.session_state.escalation_contact = None
 
         st.rerun()
-
 
     st.write("---")
 
@@ -610,11 +593,7 @@ if final_prompt:
             # =================================================
             # STREAM RESPONSE
             # =================================================
-            st.write_stream(
-                text_streamer(
-                    clean_output
-                )
-            )
+            st.markdown(clean_output)
 
 
             # =================================================
